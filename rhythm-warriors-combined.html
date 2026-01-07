@@ -1,0 +1,2672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythm Warriors - Complete Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #gameContainer {
+            width: 100%;
+            max-width: 900px;
+            height: 650px;
+            background: linear-gradient(to bottom, #0a0a15 0%, #16213e 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .ui-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        #score, #combo, #health, #lives, #wave, #storyText {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 16px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.4);
+        }
+
+        #storyText {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: 80%;
+            text-align: center;
+            font-size: 14px;
+            padding: 12px 20px;
+            display: none;
+        }
+
+        #combo.active {
+            animation: pulse 0.3s ease;
+            border-color: #FFD700;
+        }
+
+        .pause-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: 2px solid rgba(102, 126, 234, 0.4);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 20;
+        }
+
+        .pause-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .pause-btn:active {
+            transform: scale(0.95);
+        }
+
+        .arrow-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+            border: 3px solid rgba(255, 215, 0, 0.6);
+            padding: 15px 25px;
+            border-radius: 50%;
+            font-size: 32px;
+            cursor: pointer;
+            pointer-events: auto;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+            z-index: 20;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arrow-btn:hover:not(.cooldown) {
+            background: rgba(102, 126, 234, 1);
+            border-color: #FFD700;
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.7);
+        }
+
+        .arrow-btn:active:not(.cooldown) {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        .arrow-btn.cooldown {
+            background: rgba(60, 60, 60, 0.8);
+            border-color: rgba(100, 100, 100, 0.6);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .arrow-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+
+        .arrow-cooldown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            display: none;
+        }
+
+        .arrow-btn.cooldown .arrow-icon {
+            opacity: 0.3;
+        }
+
+        .arrow-btn.cooldown .arrow-cooldown {
+            display: block;
+        }
+
+        .arrow-btn.active {
+            background: rgba(255, 215, 0, 0.9);
+            border-color: #FFD700;
+            box-shadow: 0 8px 40px rgba(255, 215, 0, 0.9);
+            animation: arrowPulse 0.8s ease-in-out infinite;
+        }
+
+        @keyframes arrowPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            margin: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: auto;
+        }
+
+        .btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #546e7a, #78909c);
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            pointer-events: auto;
+        }
+        
+        .screen * {
+            pointer-events: auto;
+        }
+
+        .screen.hidden {
+            display: none;
+        }
+
+        .screen h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 56px;
+            font-weight: 900;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #FFD700);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .screen h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .screen p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            line-height: 1.8;
+            max-width: 600px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: auto;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+            pointer-events: auto;
+        }
+
+        .mode-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            min-width: 200px;
+            pointer-events: auto;
+        }
+
+        .mode-card:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+            transform: translateY(-5px);
+        }
+
+        .mode-card h3 {
+            color: #FFD700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .mode-card p {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+            max-width: 600px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: #FFD700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        #countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 120px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            color: #FFD700;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+            display: none;
+            z-index: 200;
+            pointer-events: none;
+        }
+
+        .click-zone {
+            position: absolute;
+            bottom: 0;
+            width: 33.33%;
+            height: 200px;
+            cursor: pointer;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        #lane0 { left: 0; }
+        #lane1 { left: 33.33%; }
+        #lane2 { left: 66.66%; }
+
+        .click-zone.arrow-target {
+            background: rgba(255, 215, 0, 0.2);
+            border: 3px dashed rgba(255, 215, 0, 0.6);
+            cursor: crosshair;
+            animation: targetPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes targetPulse {
+            0%, 100% { background: rgba(255, 215, 0, 0.2); }
+            50% { background: rgba(255, 215, 0, 0.3); }
+        }
+
+        #player1Indicator, #player2Indicator {
+            position: absolute;
+            bottom: 10px;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            display: none;
+            border: 2px solid;
+            z-index: 15;
+        }
+
+        #player1Indicator {
+            left: 20px;
+            border-color: #667eea;
+        }
+
+        #player2Indicator {
+            right: 20px;
+            border-color: #f093fb;
+        }
+
+        #storyProgress {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 15px 30px;
+            border-radius: 15px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            border: 2px solid rgba(102, 126, 234, 0.4);
+            display: none;
+            z-index: 10;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="ui">
+            <div class="ui-group">
+                <div id="score">Score: 0</div>
+                <div id="combo">Combo: x0</div>
+            </div>
+            <div class="ui-group">
+                <div id="health">Health: 100</div>
+                <div id="lives">Lives: 3</div>
+                <div id="wave">Wave: 1</div>
+            </div>
+        </div>
+
+        <button class="arrow-btn" id="arrowBtn" style="display:none;">
+            <span class="arrow-icon">🏹</span>
+            <span class="arrow-cooldown" id="arrowCooldown"></span>
+        </button>
+
+        <div id="storyProgress">
+            <div>Chapter <span id="chapterNum">1</span>: <span id="chapterTitle"></span></div>
+        </div>
+
+        <div id="storyText"></div>
+
+        <div id="countdown"></div>
+
+        <div class="click-zone" id="lane0"></div>
+        <div class="click-zone" id="lane1"></div>
+        <div class="click-zone" id="lane2"></div>
+
+        <div id="player1Indicator">
+            <div>Player 1</div>
+            <div id="p1Score">Score: 0</div>
+            <div id="p1Combo">Combo: x0</div>
+        </div>
+        <div id="player2Indicator">
+            <div>Player 2</div>
+            <div id="p2Score">Score: 0</div>
+            <div id="p2Combo">Combo: x0</div>
+        </div>
+
+        <!-- Main Menu -->
+        <div id="mainMenu" class="screen">
+            <h1>RHYTHM WARRIORS</h1>
+            <p>Slash to the beat and defend the realm!</p>
+            <div class="menu-buttons">
+                <button class="btn" id="classicBtn">Classic Mode</button>
+                <button class="btn" id="endlessBtn">Endless Mode</button>
+                <button class="btn" id="multiplayerBtn">Multiplayer</button>
+                <button class="btn" id="storyBtn">Story Mode</button>
+                <button class="btn btn-secondary" id="statsBtn">Stats</button>
+                <button class="btn btn-secondary" id="howToPlayBtn">How to Play</button>
+            </div>
+        </div>
+
+        <!-- Mode Select -->
+        <div id="modeSelect" class="screen hidden">
+            <h2>Select Difficulty</h2>
+            <div class="mode-grid">
+                <div class="mode-card" data-difficulty="easy">
+                    <h3>🟢 Easy</h3>
+                    <p>Perfect for beginners</p>
+                    <p>Slower enemies, more health</p>
+                </div>
+                <div class="mode-card" data-difficulty="normal">
+                    <h3>🟡 Normal</h3>
+                    <p>Balanced challenge</p>
+                    <p>Standard gameplay</p>
+                </div>
+                <div class="mode-card" data-difficulty="hard">
+                    <h3>🔴 Hard</h3>
+                    <p>For veterans</p>
+                    <p>Fast enemies, limited health</p>
+                </div>
+                <div class="mode-card" data-difficulty="insane">
+                    <h3>💀 Insane</h3>
+                    <p>Ultimate challenge</p>
+                    <p>Brutal speed, one mistake hurts</p>
+                </div>
+            </div>
+            <button class="btn btn-secondary" id="backFromMode">Back</button>
+        </div>
+
+        <!-- Story Intro -->
+        <div id="storyIntro" class="screen hidden">
+            <h2>Story Mode</h2>
+            <p>The realm is under attack by rhythmic demons! As the last Rhythm Warrior, you must defend your land through three epic chapters. Each chapter introduces new challenges and enemies. Can you save the kingdom?</p>
+            <button class="btn" id="startStoryBtn">Begin Your Journey</button>
+            <button class="btn btn-secondary" id="backFromStory">Back</button>
+        </div>
+
+        <!-- Pause Menu -->
+        <div id="pauseMenu" class="screen hidden">
+            <h2>PAUSED</h2>
+            <div class="menu-buttons">
+                <button class="btn" id="resumeBtn">Resume</button>
+                <button class="btn btn-secondary" id="restartBtn">Restart</button>
+                <button class="btn btn-secondary" id="quitBtn">Quit to Menu</button>
+            </div>
+        </div>
+
+        <!-- Game Over -->
+        <div id="gameOver" class="screen hidden">
+            <h2>GAME OVER</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Final Score</div>
+                    <div class="stat-value" id="finalScore">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Max Combo</div>
+                    <div class="stat-value" id="finalCombo">x0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Waves Survived</div>
+                    <div class="stat-value" id="finalWave">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Accuracy</div>
+                    <div class="stat-value" id="finalAccuracy">0%</div>
+                </div>
+            </div>
+            <button class="btn" id="nextChapterBtn" style="display:none;">Next Chapter</button>
+            <div class="menu-buttons">
+                <button class="btn" id="playAgainBtn">Play Again</button>
+                <button class="btn btn-secondary" id="mainMenuBtn">Main Menu</button>
+            </div>
+        </div>
+
+        <!-- Stats Screen -->
+        <div id="stats" class="screen hidden">
+            <h2>Your Stats</h2>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">High Score</div>
+                    <div class="stat-value" id="statHighScore">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Max Combo</div>
+                    <div class="stat-value" id="statMaxCombo">x0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Enemies Defeated</div>
+                    <div class="stat-value" id="statTotalEnemies">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Accuracy</div>
+                    <div class="stat-value" id="statAccuracy">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Perfect Hits</div>
+                    <div class="stat-value" id="statPerfectHits">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Games Played</div>
+                    <div class="stat-value" id="statGames">0</div>
+                </div>
+            </div>
+            <button class="btn" id="backFromStats">Back</button>
+        </div>
+
+        <!-- How to Play -->
+        <div id="howToPlay" class="screen hidden">
+            <h2>How to Play</h2>
+            <p><strong>🎯 Objective:</strong> Slash enemies when they reach the bottom line to score points and survive waves!</p>
+            <p><strong>🎮 Controls:</strong><br>
+            Click on lanes or use keyboard:<br>
+            Lane 1 (Left): A or 1<br>
+            Lane 2 (Middle): S or 2<br>
+            Lane 3 (Right): D or 3<br>
+            Pause: ESC or P</p>
+            <p><strong>⚔️ Gameplay:</strong><br>
+            • Hit enemies at the perfect moment for bonus points<br>
+            • Build combos for score multipliers<br>
+            • Collect power-ups for special abilities<br>
+            • Survive waves to progress</p>
+            <p><strong>💎 Power-ups:</strong><br>
+            ❤️ Health: Restore health<br>
+            🛡️ Shield: Temporary invincibility<br>
+            ⚡ Multishot: Hit multiple lanes<br>
+            ⭐ Score Boost: Double points<br>
+            ⚔️ Giant Sword: Bigger slash, deals double damage</p>
+            <button class="btn" id="backFromHowTo">Back</button>
+        </div>
+
+        <!-- Story Cutscene Modal -->
+        <div id="cutsceneModal" class="screen hidden" style="background: #000;">
+            <canvas id="cutsceneCanvas" style="width: 100%; height: 100%;"></canvas>
+            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 800px; text-align: center; pointer-events: none;">
+                <h2 id="cutsceneTitle" style="margin-bottom: 40px; color: white; font-family: 'Orbitron', sans-serif; font-size: 48px; text-shadow: 0 0 20px rgba(102, 126, 234, 0.8);"></h2>
+                <div id="cutsceneText" style="font-size: 28px; line-height: 1.8; min-height: 100px; margin-bottom: 40px; color: white; text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.9);"></div>
+            </div>
+            <button class="btn" id="skipCutsceneBtn" style="position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); pointer-events: auto;">Skip</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONSTANTS
+        // ============================================
+        const GAME_CONFIG = {
+            CANVAS_WIDTH: 900,
+            CANVAS_HEIGHT: 650,
+            LANES: 3,
+            TARGET_LINE_Y: 550,
+            PERFECT_HIT_RANGE: 20,
+            GOOD_HIT_RANGE: 50,
+            BASE_SCORE: 100,
+            COMBO_MULTIPLIER: 1.5,
+            MAX_COMBO_DISPLAY: 50,
+            COUNTDOWN_START: 3,
+            INITIAL_LIVES: 3,
+            BASE_HEALTH: 100,
+            POWERUP_DURATION: 10000,
+            SCREEN_SHAKE_DECAY: 0.9,
+            PARTICLE_LIFETIME: 60,
+            SLASH_EFFECT_DURATION: 20,
+            MISS_EFFECT_DURATION: 25,
+            BEAT_INDICATOR_SIZE: 10,
+            WAVE_REQUIREMENT_BASE: 8,
+            WAVE_REQUIREMENT_MULTIPLIER: 1.2,
+            BOSS_WAVE_INTERVAL: 5,
+            BOSS_HEALTH: 3,
+            HERO_Y_OFFSET: 80,
+            HERO_SIZE: 60,
+            ENEMY_SIZE: 45,
+            BOSS_SIZE: 70,
+            POWERUP_SIZE: 25,
+            ARROW_COOLDOWN: 4000,
+            ARROW_SPEED: 8,
+            ARROW_SIZE: 15,
+            STORAGE_KEY: 'rhythmWarriorsStats'
+        };
+
+        const COLORS = {
+            HERO_P1: '#FFD700',
+            HERO_P2: '#4ECDC4',
+            HERO_P1_BODY: '#FFA500',
+            HERO_P2_BODY: '#45B7D1',
+            ENEMIES: ['#E74C3C', '#F39C12', '#9B59B6', '#3498DB', '#E67E22'],
+            BOSS: '#C0392B',
+            BOSS_CENTER: '#FF4444',
+            POWERUPS: {
+                health: '#FF6B9D',
+                shield: '#3498DB',
+                multishot: '#F1C40F',
+                scoreBoost: '#9B59B6',
+                giantSword: '#E74C3C'
+            },
+            PERFECT_HIT: '#FFD700',
+            GOOD_HIT: '#FFA500',
+            MISS: '#FF4444',
+            SLASH: '#FFD700',
+            BEAT_INDICATOR: 'rgba(255, 255, 255, 0.3)'
+        };
+
+        const DIFFICULTY_SETTINGS = {
+            easy: {
+                spawnRate: 1200,
+                speedMultiplier: 0.8,
+                healthMultiplier: 1.5,
+                damageMultiplier: 0.7,
+                scoreMultiplier: 0.8
+            },
+            normal: {
+                spawnRate: 1000,
+                speedMultiplier: 1,
+                healthMultiplier: 1,
+                damageMultiplier: 1,
+                scoreMultiplier: 1
+            },
+            hard: {
+                spawnRate: 800,
+                speedMultiplier: 1.3,
+                healthMultiplier: 0.7,
+                damageMultiplier: 1.5,
+                scoreMultiplier: 1.5
+            },
+            insane: {
+                spawnRate: 600,
+                speedMultiplier: 1.6,
+                healthMultiplier: 0.5,
+                damageMultiplier: 2,
+                scoreMultiplier: 2
+            }
+        };
+
+        const POWERUP_TYPES = {
+            health: { icon: '❤️', duration: 0 },
+            shield: { icon: '🛡️', duration: 10000 },
+            multishot: { icon: '⚡', duration: 8000 },
+            scoreBoost: { icon: '⭐', duration: 10000 },
+            giantSword: { icon: '⚔️', duration: 12000 }
+        };
+
+        const STORY_CHAPTERS = {
+            1: {
+                title: "The First Assault",
+                description: "Mysterious rhythmic creatures have appeared at the kingdom's gates...",
+                waves: 5,
+                openingCutscene: {
+                    dialogue: [
+                        { text: "In the kingdom of Harmonia, peace reigned for centuries...", duration: 3000 },
+                        { text: "Until the day the rhythm faltered.", duration: 3000 },
+                        { text: "Dark creatures emerged, moving to a twisted beat.", duration: 3000 },
+                        { text: "As the last Rhythm Warrior, you must restore the harmony!", duration: 3000 }
+                    ]
+                },
+                endingCutscene: {
+                    dialogue: [
+                        { text: "The first wave has been repelled!", duration: 2500 },
+                        { text: "But this is only the beginning...", duration: 2500 }
+                    ]
+                }
+            },
+            2: {
+                title: "The Demon Lord Rises",
+                description: "The attacks intensify. A powerful demon lord leads the invasion!",
+                waves: 8,
+                openingCutscene: {
+                    dialogue: [
+                        { text: "The enemies grow stronger.", duration: 3000 },
+                        { text: "A dark presence emerges from the shadows...", duration: 3000 },
+                        { text: "The Demon Lord of Discord has arrived!", duration: 3000 },
+                        { text: "Your blade and rhythm must become one to survive.", duration: 3000 }
+                    ]
+                },
+                endingCutscene: {
+                    dialogue: [
+                        { text: "The Demon Lord retreats, but not defeated...", duration: 2500 },
+                        { text: "One final battle awaits.", duration: 2500 }
+                    ]
+                }
+            },
+            3: {
+                title: "Final Stand",
+                description: "This is it. Defeat the ultimate boss to save the realm!",
+                waves: 10,
+                openingCutscene: {
+                    dialogue: [
+                        { text: "The final confrontation is here.", duration: 3000 },
+                        { text: "The Demon Lord gathers all his power...", duration: 3000 },
+                        { text: "This battle will decide the fate of Harmonia.", duration: 3000 },
+                        { text: "Fight with everything you have!", duration: 3000 }
+                    ]
+                },
+                endingCutscene: {
+                    dialogue: [
+                        { text: "Victory! The Demon Lord is defeated!", duration: 3000 },
+                        { text: "Harmony returns to the kingdom...", duration: 3000 },
+                        { text: "The rhythm flows pure once more.", duration: 3000 },
+                        { text: "You are the true Rhythm Warrior!", duration: 3000 }
+                    ]
+                }
+            }
+        };
+
+        const KEY_BINDINGS = {
+            'a': 0, '1': 0,
+            's': 1, '2': 1,
+            'd': 2, '3': 2,
+            'escape': 'pause', 'p': 'pause'
+        };
+
+        const MUSIC_TRACKS = {
+            bass: [
+                [65, 65, 73, 73, 82, 82, 73, 73],
+                [65, 82, 73, 87, 82, 73, 65, 73],
+                [65, 98, 73, 92, 82, 87, 73, 82]
+            ],
+            melody: [
+                [261, 294, 330, 349, 392, 349, 330, 294],
+                [523, 587, 659, 698, 784, 698, 659, 587],
+                [523, 659, 784, 880, 1047, 880, 784, 659]
+            ],
+            harmony: [
+                [196, 220, 247, 262, 294, 262, 247, 220],
+                [392, 440, 494, 523, 587, 523, 494, 440],
+                [392, 523, 622, 698, 784, 698, 622, 523]
+            ]
+        };
+
+        // ============================================
+        // GAME STATE
+        // ============================================
+        class GameState {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.active = false;
+                this.paused = false;
+                this.gameMode = 'classic';
+                this.difficulty = 'normal';
+                this.score = 0;
+                this.combo = 0;
+                this.maxCombo = 0;
+                this.health = GAME_CONFIG.BASE_HEALTH;
+                this.maxHealth = GAME_CONFIG.BASE_HEALTH;
+                this.lives = GAME_CONFIG.INITIAL_LIVES;
+                this.wave = 1;
+                this.waveEnemies = 0;
+                this.waveEnemiesDefeated = 0;
+                this.enemies = [];
+                this.arrows = [];
+                this.beatIndicators = [];
+                this.particles = [];
+                this.slashEffects = [];
+                this.missEffects = [];
+                this.powerups = [];
+                this.activePowerups = [];
+                this.bossFight = false;
+                this.gameTime = 0;
+                this.lastSpawnTime = 0;
+                this.beatInterval = DIFFICULTY_SETTINGS.normal.spawnRate;
+                this.totalHits = 0;
+                this.totalMisses = 0;
+                this.perfectHits = 0;
+                this.screenShake = 0;
+                this.player2Score = 0;
+                this.player2Combo = 0;
+                this.player2MaxCombo = 0;
+                this.storyChapter = 1;
+                this.arrowCooldown = 0;
+                this.arrowLastShot = 0;
+                this.arrowMode = false;
+            }
+
+            getDifficultySettings() {
+                return DIFFICULTY_SETTINGS[this.difficulty];
+            }
+
+            incrementCombo() {
+                this.combo++;
+                this.maxCombo = Math.max(this.maxCombo, this.combo);
+            }
+
+            resetCombo() {
+                this.combo = 0;
+            }
+
+            calculateScore(basePoints, isPerfect = false) {
+                const settings = this.getDifficultySettings();
+                let score = basePoints * settings.scoreMultiplier;
+                
+                if (this.combo > 1) {
+                    score *= (1 + (this.combo * 0.1));
+                }
+                
+                if (isPerfect) {
+                    score *= 1.5;
+                }
+                
+                if (this.hasActivePowerup('scoreBoost')) {
+                    score *= 2;
+                }
+                
+                return Math.floor(score);
+            }
+
+            takeDamage(damage) {
+                const settings = this.getDifficultySettings();
+                const actualDamage = damage * settings.damageMultiplier;
+                
+                if (!this.hasActivePowerup('shield')) {
+                    this.health = Math.max(0, this.health - actualDamage);
+                    this.screenShake = 10;
+                    
+                    if (this.health <= 0) {
+                        this.loseLife();
+                    }
+                }
+            }
+
+            loseLife() {
+                this.lives--;
+                if (this.lives > 0) {
+                    this.health = this.maxHealth;
+                }
+            }
+
+            isGameOver() {
+                return this.lives <= 0;
+            }
+
+            hasActivePowerup(type) {
+                return this.activePowerups.some(p => p.type === type);
+            }
+
+            addPowerup(type) {
+                // Handle instant powerups
+                if (type === 'health') {
+                    this.health = Math.min(this.maxHealth, this.health + 30);
+                    return;
+                }
+                
+                // Remove existing powerup of same type
+                this.activePowerups = this.activePowerups.filter(p => p.type !== type);
+                
+                // Add new powerup
+                this.activePowerups.push({
+                    type: type,
+                    startTime: Date.now()
+                });
+            }
+
+            updatePowerups() {
+                const currentTime = Date.now();
+                this.activePowerups = this.activePowerups.filter(p => {
+                    const duration = POWERUP_TYPES[p.type].duration;
+                    return currentTime - p.startTime < duration;
+                });
+            }
+
+            canShootArrow() {
+                const currentTime = Date.now();
+                return currentTime - this.arrowLastShot >= GAME_CONFIG.ARROW_COOLDOWN;
+            }
+
+            shootArrow(x, y) {
+                if (this.canShootArrow()) {
+                    this.arrows.push(new Arrow(x, y));
+                    this.arrowLastShot = Date.now();
+                    return true;
+                }
+                return false;
+            }
+
+            getArrowCooldownRemaining() {
+                const currentTime = Date.now();
+                const elapsed = currentTime - this.arrowLastShot;
+                const remaining = Math.max(0, GAME_CONFIG.ARROW_COOLDOWN - elapsed);
+                return Math.ceil(remaining / 1000);
+            }
+        }
+
+        // ============================================
+        // PLAYER STATS
+        // ============================================
+        class PlayerStats {
+            constructor() {
+                this.load();
+            }
+
+            load() {
+                try {
+                    const saved = localStorage.getItem(GAME_CONFIG.STORAGE_KEY);
+                    if (saved) {
+                        Object.assign(this, JSON.parse(saved));
+                    } else {
+                        this.reset();
+                    }
+                } catch (error) {
+                    console.error('Failed to load stats:', error);
+                    this.reset();
+                }
+            }
+
+            save() {
+                try {
+                    localStorage.setItem(GAME_CONFIG.STORAGE_KEY, JSON.stringify(this));
+                } catch (error) {
+                    console.error('Failed to save stats:', error);
+                }
+            }
+
+            reset() {
+                this.highScore = 0;
+                this.maxCombo = 0;
+                this.totalEnemies = 0;
+                this.totalHits = 0;
+                this.totalMisses = 0;
+                this.perfectHits = 0;
+                this.gamesPlayed = 0;
+            }
+
+            update(gameState) {
+                this.highScore = Math.max(this.highScore, gameState.score);
+                this.maxCombo = Math.max(this.maxCombo, gameState.maxCombo);
+                this.totalEnemies += gameState.waveEnemiesDefeated;
+                this.totalHits += gameState.totalHits;
+                this.totalMisses += gameState.totalMisses;
+                this.perfectHits += gameState.perfectHits;
+                this.gamesPlayed++;
+                this.save();
+            }
+
+            getAccuracy() {
+                const total = this.totalHits + this.totalMisses;
+                return total > 0 ? ((this.totalHits / total) * 100).toFixed(1) : 0;
+            }
+        }
+
+        // ============================================
+        // AUDIO SYSTEM
+        // ============================================
+        class AudioSystem {
+            constructor() {
+                this.context = null;
+                this.musicGain = null;
+                this.masterGain = null;
+                this.initialized = false;
+                this.currentBeat = 0;
+                this.musicScheduler = null;
+            }
+
+            init() {
+                if (this.initialized) return;
+                
+                try {
+                    this.context = new (window.AudioContext || window.webkitAudioContext)();
+                    this.masterGain = this.context.createGain();
+                    this.masterGain.connect(this.context.destination);
+                    this.masterGain.gain.value = 0.3;
+                    
+                    this.musicGain = this.context.createGain();
+                    this.musicGain.connect(this.masterGain);
+                    this.musicGain.gain.value = 0.2;
+                    
+                    this.initialized = true;
+                } catch (error) {
+                    console.error('Failed to initialize audio:', error);
+                }
+            }
+
+            playTone(frequency, duration, volume = 0.3, type = 'sine') {
+                if (!this.initialized) return;
+                
+                try {
+                    const oscillator = this.context.createOscillator();
+                    const gainNode = this.context.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.masterGain);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = type;
+                    
+                    gainNode.gain.setValueAtTime(volume, this.context.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + duration);
+                    
+                    oscillator.start(this.context.currentTime);
+                    oscillator.stop(this.context.currentTime + duration);
+                } catch (error) {
+                    console.error('Failed to play tone:', error);
+                }
+            }
+
+            playHitSound(isPerfect) {
+                const frequency = isPerfect ? 800 : 600;
+                this.playTone(frequency, 0.1, 0.3);
+            }
+
+            playMissSound() {
+                this.playTone(200, 0.2, 0.2);
+            }
+
+            playPowerupSound() {
+                this.playTone(1000, 0.15, 0.25);
+                setTimeout(() => this.playTone(1200, 0.15, 0.25), 150);
+            }
+
+            getMusicTrackIndex(wave) {
+                if (wave <= 2) return 0;
+                if (wave <= 4) return 1;
+                return 2;
+            }
+
+            startMusic(gameStateRef) {
+                if (!this.initialized) return;
+                
+                try {
+                    this.currentBeat = 0;
+                    const beatDuration = 500; // milliseconds per beat
+                    
+                    const playMusicBeat = () => {
+                        if (!gameStateRef.active || gameStateRef.paused) {
+                            return;
+                        }
+                        
+                        const trackIndex = this.getMusicTrackIndex(gameStateRef.wave);
+                        const beatIndex = this.currentBeat % 8;
+                        
+                        // Play bass
+                        const bassNote = MUSIC_TRACKS.bass[trackIndex][beatIndex];
+                        this.playMusicNote(bassNote, 0.3, 'triangle');
+                        
+                        // Play melody
+                        const melodyNote = MUSIC_TRACKS.melody[trackIndex][beatIndex];
+                        this.playMusicNote(melodyNote, 0.15, 'sine');
+                        
+                        // Play harmony
+                        const harmonyNote = MUSIC_TRACKS.harmony[trackIndex][beatIndex];
+                        this.playMusicNote(harmonyNote, 0.1, 'sine');
+                        
+                        this.currentBeat++;
+                        
+                        if (gameStateRef.active && !gameStateRef.paused) {
+                            this.musicScheduler = setTimeout(playMusicBeat, beatDuration);
+                        }
+                    };
+                    
+                    playMusicBeat();
+                } catch (error) {
+                    console.error('Failed to start music:', error);
+                }
+            }
+
+            playMusicNote(frequency, volume, type) {
+                if (!this.initialized) return;
+                
+                try {
+                    const osc = this.context.createOscillator();
+                    const gain = this.context.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(this.musicGain);
+                    
+                    osc.frequency.value = frequency;
+                    osc.type = type;
+                    
+                    gain.gain.setValueAtTime(volume, this.context.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.context.currentTime + 0.4);
+                    
+                    osc.start(this.context.currentTime);
+                    osc.stop(this.context.currentTime + 0.4);
+                } catch (error) {
+                    console.error('Failed to play music note:', error);
+                }
+            }
+
+            stopMusic() {
+                if (this.musicScheduler) {
+                    clearTimeout(this.musicScheduler);
+                    this.musicScheduler = null;
+                }
+            }
+        }
+
+        // ============================================
+        // ENTITY CLASSES
+        // ============================================
+        class Hero {
+            constructor(canvasRef, lane, isPlayer2 = false) {
+                this.canvas = canvasRef;
+                this.lane = lane;
+                this.isPlayer2 = isPlayer2;
+                this.size = GAME_CONFIG.HERO_SIZE;
+                this.attackAnimation = 0;
+                this.idleAnimation = 0;
+                this.color = isPlayer2 ? COLORS.HERO_P2 : COLORS.HERO_P1;
+                this.bodyColor = isPlayer2 ? COLORS.HERO_P2_BODY : COLORS.HERO_P1_BODY;
+                this.updatePosition();
+            }
+
+            updatePosition() {
+                const laneWidth = GAME_CONFIG.CANVAS_WIDTH / GAME_CONFIG.LANES;
+                this.x = (this.lane * laneWidth) + (laneWidth / 2);
+                this.y = GAME_CONFIG.CANVAS_HEIGHT - GAME_CONFIG.HERO_Y_OFFSET;
+            }
+
+            attack() {
+                this.attackAnimation = 20;
+            }
+
+            draw(ctx, hasGiantSword = false) {
+                this.idleAnimation += 0.05;
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                
+                const breathe = Math.sin(this.idleAnimation) * 3;
+                ctx.translate(0, breathe);
+                
+                if (this.attackAnimation > 0) {
+                    ctx.rotate(Math.sin(this.attackAnimation * 0.5) * 0.4);
+                    this.attackAnimation--;
+                }
+
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = this.color;
+                
+                // Draw body (triangle)
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size * 0.8);
+                ctx.lineTo(this.size * 0.5, this.size * 0.4);
+                ctx.lineTo(-this.size * 0.5, this.size * 0.4);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Draw head
+                ctx.fillStyle = this.bodyColor;
+                ctx.beginPath();
+                ctx.arc(0, -this.size * 0.5, this.size * 0.35, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw eyes
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(-this.size * 0.15, -this.size * 0.55, this.size * 0.08, 0, Math.PI * 2);
+                ctx.arc(this.size * 0.15, -this.size * 0.55, this.size * 0.08, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw slash effect during attack
+                if (this.attackAnimation > 10) {
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = hasGiantSword ? 10 : 5;
+                    ctx.shadowBlur = hasGiantSword ? 60 : 40;
+                    ctx.shadowColor = this.color;
+                    ctx.beginPath();
+                    
+                    if (hasGiantSword) {
+                        // Giant sword - much bigger and longer
+                        ctx.moveTo(-this.size * 1.2, -this.size * 0.5);
+                        ctx.lineTo(this.size * 1.2, this.size * 1.2);
+                    } else {
+                        // Normal sword
+                        ctx.moveTo(-this.size * 0.6, -this.size * 0.2);
+                        ctx.lineTo(this.size * 0.6, this.size * 0.6);
+                    }
+                    ctx.stroke();
+                    
+                    // Add extra glow for giant sword
+                    if (hasGiantSword) {
+                        ctx.strokeStyle = '#FFD700';
+                        ctx.lineWidth = 6;
+                        ctx.shadowBlur = 80;
+                        ctx.shadowColor = '#FFD700';
+                        ctx.beginPath();
+                        ctx.moveTo(-this.size * 1.2, -this.size * 0.5);
+                        ctx.lineTo(this.size * 1.2, this.size * 1.2);
+                        ctx.stroke();
+                    }
+                }
+
+                ctx.restore();
+            }
+        }
+
+        class Enemy {
+            constructor(lane, isBoss = false, wave = 1, difficulty = 'normal') {
+                this.lane = lane;
+                this.y = -50;
+                this.isBoss = isBoss;
+                this.size = isBoss ? GAME_CONFIG.BOSS_SIZE : GAME_CONFIG.ENEMY_SIZE;
+                this.health = isBoss ? GAME_CONFIG.BOSS_HEALTH : 1;
+                this.maxHealth = this.health;
+                this.hitTime = 0;
+                this.rotation = 0;
+                
+                const settings = DIFFICULTY_SETTINGS[difficulty];
+                this.speed = (2 + wave * 0.1) * settings.speedMultiplier;
+                
+                this.color = isBoss ? COLORS.BOSS : 
+                    COLORS.ENEMIES[Math.floor(Math.random() * COLORS.ENEMIES.length)];
+                
+                this.updatePosition();
+            }
+
+            updatePosition() {
+                const laneWidth = GAME_CONFIG.CANVAS_WIDTH / GAME_CONFIG.LANES;
+                this.x = (this.lane * laneWidth) + (laneWidth / 2);
+            }
+
+            update() {
+                this.y += this.speed;
+                this.rotation += 0.03;
+                if (this.hitTime > 0) this.hitTime--;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                if (this.hitTime > 0) {
+                    ctx.globalAlpha = 0.5 + Math.sin(this.hitTime * 0.5) * 0.5;
+                }
+
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 25;
+                ctx.shadowColor = this.color;
+                
+                if (this.isBoss) {
+                    // Draw star shape for boss
+                    ctx.beginPath();
+                    for (let i = 0; i < 8; i++) {
+                        const angle = (i / 8) * Math.PI * 2;
+                        const radius = this.size * (i % 2 === 0 ? 1 : 0.6);
+                        const x = Math.cos(angle) * radius;
+                        const y = Math.sin(angle) * radius;
+                        if (i === 0) ctx.moveTo(x, y);
+                        else ctx.lineTo(x, y);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    // Draw center circle
+                    ctx.fillStyle = COLORS.BOSS_CENTER;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size * 0.3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw health number
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 20px Orbitron';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(this.health, 0, 0);
+
+                    // Draw health ring
+                    const healthPercent = this.health / this.maxHealth;
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size + 15, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * healthPercent);
+                    ctx.stroke();
+                } else {
+                    // Draw circle for normal enemy
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw eyes
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                    ctx.beginPath();
+                    ctx.arc(-this.size * 0.3, -this.size * 0.15, this.size * 0.2, 0, Math.PI * 2);
+                    ctx.arc(this.size * 0.3, -this.size * 0.15, this.size * 0.2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            isAtTarget() {
+                return Math.abs(this.y - GAME_CONFIG.TARGET_LINE_Y) <= GAME_CONFIG.GOOD_HIT_RANGE;
+            }
+
+            isPastTarget() {
+                return this.y > GAME_CONFIG.TARGET_LINE_Y + GAME_CONFIG.GOOD_HIT_RANGE;
+            }
+
+            getDistanceFromTarget() {
+                return Math.abs(this.y - GAME_CONFIG.TARGET_LINE_Y);
+            }
+
+            takeDamage(amount = 1) {
+                this.health -= amount;
+                this.hitTime = 10;
+                return this.health <= 0;
+            }
+        }
+
+        class Powerup {
+            constructor(lane, type) {
+                this.lane = lane;
+                this.type = type;
+                this.y = -30;
+                this.size = GAME_CONFIG.POWERUP_SIZE;
+                this.speed = 1.5;
+                this.rotation = 0;
+                this.color = COLORS.POWERUPS[type];
+                this.icon = POWERUP_TYPES[type].icon;
+                this.updatePosition();
+            }
+
+            updatePosition() {
+                const laneWidth = GAME_CONFIG.CANVAS_WIDTH / GAME_CONFIG.LANES;
+                this.x = (this.lane * laneWidth) + (laneWidth / 2);
+            }
+
+            update() {
+                this.y += this.speed;
+                this.rotation += 0.05;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = this.color;
+                
+                // Draw rotating square
+                ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                
+                // Draw icon
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(this.icon, 0, 0);
+
+                ctx.restore();
+            }
+
+            isPastTarget() {
+                return this.y > GAME_CONFIG.TARGET_LINE_Y + 100;
+            }
+
+            isAtTarget() {
+                return Math.abs(this.y - GAME_CONFIG.TARGET_LINE_Y) < GAME_CONFIG.GOOD_HIT_RANGE;
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = (Math.random() - 0.5) * 8;
+                this.vy = (Math.random() - 0.5) * 8 - 2;
+                this.life = 1;
+                this.decay = 0.02;
+                this.size = Math.random() * 4 + 2;
+                this.color = color;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.2;
+                this.life -= this.decay;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+
+            isDead() {
+                return this.life <= 0;
+            }
+        }
+
+        class SlashEffect {
+            constructor(x, y, isGiantSword = false) {
+                this.x = x;
+                this.y = y;
+                this.life = 1;
+                this.decay = 0.05;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.isGiantSword = isGiantSword;
+            }
+
+            update() {
+                this.life -= this.decay;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                if (this.isGiantSword) {
+                    // Giant sword slash - bigger and thicker
+                    ctx.strokeStyle = COLORS.SLASH;
+                    ctx.lineWidth = 10;
+                    ctx.shadowBlur = 40;
+                    ctx.shadowColor = COLORS.SLASH;
+                    ctx.beginPath();
+                    ctx.moveTo(-80, -40);
+                    ctx.lineTo(80, 40);
+                    ctx.stroke();
+                    
+                    // Extra glow
+                    ctx.strokeStyle = '#FFF';
+                    ctx.lineWidth = 6;
+                    ctx.shadowBlur = 50;
+                    ctx.beginPath();
+                    ctx.moveTo(-80, -40);
+                    ctx.lineTo(80, 40);
+                    ctx.stroke();
+                } else {
+                    // Normal slash
+                    ctx.strokeStyle = COLORS.SLASH;
+                    ctx.lineWidth = 5;
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = COLORS.SLASH;
+                    ctx.beginPath();
+                    ctx.moveTo(-40, -20);
+                    ctx.lineTo(40, 20);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            }
+
+            isDead() {
+                return this.life <= 0;
+            }
+        }
+
+        class MissEffect {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.life = 1;
+                this.decay = 0.04;
+            }
+
+            update() {
+                this.life -= this.decay;
+                this.y -= 2;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = COLORS.MISS;
+                ctx.font = 'bold 24px Orbitron';
+                ctx.textAlign = 'center';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = COLORS.MISS;
+                ctx.fillText('MISS', this.x, this.y);
+                ctx.restore();
+            }
+
+            isDead() {
+                return this.life <= 0;
+            }
+        }
+
+        class Arrow {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.speed = GAME_CONFIG.ARROW_SPEED;
+                this.size = GAME_CONFIG.ARROW_SIZE;
+                this.rotation = -Math.PI / 2; // Point upward
+            }
+
+            update() {
+                this.y -= this.speed;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                // Draw arrow shaft
+                ctx.fillStyle = '#8B4513';
+                ctx.fillRect(-2, -this.size, 4, this.size);
+                
+                // Draw arrow head
+                ctx.fillStyle = '#C0C0C0';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#FFD700';
+                ctx.beginPath();
+                ctx.moveTo(0, -this.size - 5);
+                ctx.lineTo(-5, -this.size + 5);
+                ctx.lineTo(5, -this.size + 5);
+                ctx.closePath();
+                ctx.fill();
+                
+                // Draw fletching
+                ctx.fillStyle = '#FF4444';
+                ctx.beginPath();
+                ctx.moveTo(-3, 0);
+                ctx.lineTo(-6, 5);
+                ctx.lineTo(0, 3);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.beginPath();
+                ctx.moveTo(3, 0);
+                ctx.lineTo(6, 5);
+                ctx.lineTo(0, 3);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.restore();
+            }
+
+            isOffScreen() {
+                return this.y < -50;
+            }
+
+            checkCollision(enemy) {
+                const dx = this.x - enemy.x;
+                const dy = this.y - enemy.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                return distance < (this.size + enemy.size);
+            }
+        }
+
+        // ============================================
+        // GAME MANAGERS
+        // ============================================
+        class WaveManager {
+            constructor() {
+                this.currentWave = 1;
+            }
+
+            getEnemyCount(wave) {
+                return Math.floor(GAME_CONFIG.WAVE_REQUIREMENT_BASE * 
+                    Math.pow(GAME_CONFIG.WAVE_REQUIREMENT_MULTIPLIER, wave - 1));
+            }
+
+            isBossWave(wave) {
+                return wave % GAME_CONFIG.BOSS_WAVE_INTERVAL === 0;
+            }
+
+            createBoss(lane, wave, difficulty) {
+                return new Enemy(lane, true, wave, difficulty);
+            }
+
+            shouldAdvanceWave(gameState) {
+                return gameState.waveEnemiesDefeated >= gameState.waveEnemies && 
+                       gameState.enemies.length === 0;
+            }
+
+            startNextWave(gameState) {
+                gameState.wave++;
+                gameState.waveEnemies = this.getEnemyCount(gameState.wave);
+                gameState.waveEnemiesDefeated = 0;
+                gameState.bossFight = this.isBossWave(gameState.wave);
+                
+                if (gameState.gameMode === 'story') {
+                    const chapter = STORY_CHAPTERS[gameState.storyChapter];
+                    if (gameState.wave > chapter.waves) {
+                        return true; // Chapter complete
+                    }
+                }
+                
+                return false;
+            }
+        }
+
+        class SpawnManager {
+            constructor() {
+                this.waveManager = new WaveManager();
+            }
+
+            shouldSpawn(gameState, currentTime) {
+                if (gameState.waveEnemiesDefeated >= gameState.waveEnemies) {
+                    return false;
+                }
+                
+                return currentTime - gameState.lastSpawnTime >= gameState.beatInterval;
+            }
+
+            spawnEnemy(gameState) {
+                const lane = Math.floor(Math.random() * GAME_CONFIG.LANES);
+                let enemy;
+                
+                if (gameState.bossFight && gameState.waveEnemiesDefeated === 0) {
+                    enemy = this.waveManager.createBoss(lane, gameState.wave, gameState.difficulty);
+                } else {
+                    enemy = new Enemy(lane, false, gameState.wave, gameState.difficulty);
+                }
+                
+                gameState.enemies.push(enemy);
+                gameState.lastSpawnTime = Date.now();
+                
+                this.createBeatIndicator(gameState, lane);
+            }
+
+            createBeatIndicator(gameState, lane) {
+                const laneWidth = GAME_CONFIG.CANVAS_WIDTH / GAME_CONFIG.LANES;
+                const x = (lane * laneWidth) + (laneWidth / 2);
+                
+                gameState.beatIndicators.push({
+                    x: x,
+                    y: GAME_CONFIG.TARGET_LINE_Y,
+                    life: 30
+                });
+            }
+
+            maybeSpawnPowerup(gameState) {
+                if (Math.random() < 0.05 && gameState.powerups.length < 2) {
+                    const types = Object.keys(POWERUP_TYPES);
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    const lane = Math.floor(Math.random() * GAME_CONFIG.LANES);
+                    
+                    gameState.powerups.push(new Powerup(lane, type));
+                }
+            }
+        }
+
+        class CollisionManager {
+            constructor(audioSystem) {
+                this.audioSystem = audioSystem;
+            }
+
+            handleLaneClick(lane, gameState, heroes) {
+                let hit = false;
+                let isPerfect = false;
+                
+                // Trigger hero attack animation
+                if (heroes[lane]) {
+                    heroes[lane].attack();
+                }
+                
+                // Check if giant sword is active
+                const hasGiantSword = gameState.hasActivePowerup('giantSword');
+                
+                // Handle multishot powerup
+                const lanesToCheck = gameState.hasActivePowerup('multishot') 
+                    ? [0, 1, 2] 
+                    : [lane];
+                
+                // Check enemies in relevant lanes
+                for (const checkLane of lanesToCheck) {
+                    for (let i = gameState.enemies.length - 1; i >= 0; i--) {
+                        const enemy = gameState.enemies[i];
+                        
+                        if (enemy.lane === checkLane && enemy.isAtTarget()) {
+                            const distance = enemy.getDistanceFromTarget();
+                            
+                            if (distance <= GAME_CONFIG.PERFECT_HIT_RANGE) {
+                                isPerfect = true;
+                            }
+                            
+                            // Giant sword deals more damage
+                            const damageAmount = hasGiantSword ? 2 : 1;
+                            const defeated = enemy.takeDamage(damageAmount);
+                            
+                            if (defeated) {
+                                const basePoints = enemy.isBoss ? 1000 : GAME_CONFIG.BASE_SCORE;
+                                const score = gameState.calculateScore(basePoints, isPerfect);
+                                gameState.score += score;
+                                gameState.incrementCombo();
+                                gameState.totalHits++;
+                                
+                                if (isPerfect) {
+                                    gameState.perfectHits++;
+                                }
+                                
+                                gameState.waveEnemiesDefeated++;
+                                this.createParticles(gameState, enemy);
+                                gameState.enemies.splice(i, 1);
+                            }
+                            
+                            this.audioSystem.playHitSound(isPerfect);
+                            gameState.slashEffects.push(new SlashEffect(enemy.x, enemy.y, hasGiantSword));
+                            hit = true;
+                            
+                            if (!gameState.hasActivePowerup('multishot')) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Check powerups
+                if (!hit) {
+                    for (let i = gameState.powerups.length - 1; i >= 0; i--) {
+                        const powerup = gameState.powerups[i];
+                        
+                        if (powerup.lane === lane && powerup.isAtTarget()) {
+                            gameState.addPowerup(powerup.type);
+                            this.audioSystem.playPowerupSound();
+                            this.createParticles(gameState, powerup);
+                            gameState.powerups.splice(i, 1);
+                            hit = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!hit) {
+                    gameState.resetCombo();
+                    gameState.totalMisses++;
+                    this.audioSystem.playMissSound();
+                    
+                    const laneWidth = GAME_CONFIG.CANVAS_WIDTH / GAME_CONFIG.LANES;
+                    const x = (lane * laneWidth) + (laneWidth / 2);
+                    gameState.missEffects.push(new MissEffect(x, GAME_CONFIG.TARGET_LINE_Y - 40));
+                }
+                
+                return hit;
+            }
+
+            createParticles(gameState, entity) {
+                const particleColor = entity instanceof Powerup 
+                    ? entity.color
+                    : COLORS.PERFECT_HIT;
+                
+                for (let i = 0; i < 20; i++) {
+                    gameState.particles.push(new Particle(entity.x, entity.y, particleColor));
+                }
+            }
+
+            checkMissedEntities(gameState) {
+                // Check missed enemies
+                for (let i = gameState.enemies.length - 1; i >= 0; i--) {
+                    const enemy = gameState.enemies[i];
+                    
+                    if (enemy.isPastTarget()) {
+                        const damage = enemy.isBoss ? 30 : 10;
+                        gameState.takeDamage(damage);
+                        gameState.resetCombo();
+                        gameState.totalMisses++;
+                        gameState.enemies.splice(i, 1);
+                    }
+                }
+                
+                // Check missed powerups
+                for (let i = gameState.powerups.length - 1; i >= 0; i--) {
+                    if (gameState.powerups[i].isPastTarget()) {
+                        gameState.powerups.splice(i, 1);
+                    }
+                }
+            }
+
+            checkArrowCollisions(gameState) {
+                for (let i = gameState.arrows.length - 1; i >= 0; i--) {
+                    const arrow = gameState.arrows[i];
+                    let hit = false;
+                    
+                    // Check collision with enemies
+                    for (let j = gameState.enemies.length - 1; j >= 0; j--) {
+                        const enemy = gameState.enemies[j];
+                        
+                        if (arrow.checkCollision(enemy)) {
+                            const defeated = enemy.takeDamage(1);
+                            
+                            if (defeated) {
+                                const basePoints = enemy.isBoss ? 1000 : GAME_CONFIG.BASE_SCORE;
+                                const score = gameState.calculateScore(basePoints * 0.75); // 75% points for arrow
+                                gameState.score += score;
+                                gameState.waveEnemiesDefeated++;
+                                this.createParticles(gameState, enemy);
+                                gameState.enemies.splice(j, 1);
+                            }
+                            
+                            this.audioSystem.playHitSound(false);
+                            gameState.slashEffects.push(new SlashEffect(enemy.x, enemy.y, false));
+                            hit = true;
+                            break;
+                        }
+                    }
+                    
+                    if (hit) {
+                        gameState.arrows.splice(i, 1);
+                    }
+                }
+            }
+        }
+
+        // ============================================
+        // RENDERING
+        // ============================================
+        class Renderer {
+            constructor(canvas, ctx) {
+                this.canvas = canvas;
+                this.ctx = ctx;
+            }
+
+            clear() {
+                this.ctx.fillStyle = 'rgba(10, 10, 21, 0.3)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+
+            drawLanes() {
+                const laneWidth = this.canvas.width / GAME_CONFIG.LANES;
+                
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                this.ctx.lineWidth = 2;
+                
+                for (let i = 1; i < GAME_CONFIG.LANES; i++) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(i * laneWidth, 0);
+                    this.ctx.lineTo(i * laneWidth, this.canvas.height);
+                    this.ctx.stroke();
+                }
+            }
+
+            drawTargetLine() {
+                this.ctx.strokeStyle = 'rgba(78, 205, 196, 0.5)';
+                this.ctx.lineWidth = 3;
+                this.ctx.setLineDash([10, 5]);
+                this.ctx.beginPath();
+                this.ctx.moveTo(0, GAME_CONFIG.TARGET_LINE_Y);
+                this.ctx.lineTo(this.canvas.width, GAME_CONFIG.TARGET_LINE_Y);
+                this.ctx.stroke();
+                this.ctx.setLineDash([]);
+            }
+
+            drawBeatIndicators(gameState) {
+                gameState.beatIndicators.forEach(indicator => {
+                    const alpha = indicator.life / 30;
+                    this.ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.3})`;
+                    this.ctx.beginPath();
+                    this.ctx.arc(indicator.x, indicator.y, GAME_CONFIG.BEAT_INDICATOR_SIZE, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+            }
+
+            applyScreenShake(gameState) {
+                if (gameState.screenShake > 0) {
+                    const shakeX = (Math.random() - 0.5) * gameState.screenShake;
+                    const shakeY = (Math.random() - 0.5) * gameState.screenShake;
+                    this.ctx.translate(shakeX, shakeY);
+                    gameState.screenShake *= GAME_CONFIG.SCREEN_SHAKE_DECAY;
+                }
+            }
+
+            render(gameState, heroes) {
+                this.ctx.save();
+                this.applyScreenShake(gameState);
+                
+                this.clear();
+                this.drawLanes();
+                
+                // Draw heroes with giant sword info
+                const hasGiantSword = gameState.hasActivePowerup('giantSword');
+                heroes.forEach(hero => hero.draw(this.ctx, hasGiantSword));
+                
+                this.drawTargetLine();
+                this.drawBeatIndicators(gameState);
+                
+                // Draw entities
+                gameState.enemies.forEach(enemy => enemy.draw(this.ctx));
+                gameState.powerups.forEach(powerup => powerup.draw(this.ctx));
+                gameState.arrows.forEach(arrow => arrow.draw(this.ctx));
+                gameState.particles.forEach(particle => particle.draw(this.ctx));
+                gameState.slashEffects.forEach(effect => effect.draw(this.ctx));
+                gameState.missEffects.forEach(effect => effect.draw(this.ctx));
+                
+                this.ctx.restore();
+            }
+        }
+
+        // ============================================
+        // CUTSCENE MANAGER
+        // ============================================
+        class CutsceneManager {
+            constructor(uiManager) {
+                this.uiManager = uiManager;
+                this.currentDialogueIndex = 0;
+                this.dialogueTimeout = null;
+                this.onComplete = null;
+                this.animationFrame = null;
+                this.particles = [];
+                this.canvas = null;
+                this.ctx = null;
+            }
+
+            playCutscene(cutsceneData, title, onComplete, type = 'opening') {
+                this.currentDialogueIndex = 0;
+                this.onComplete = onComplete;
+                this.particles = [];
+                
+                // Show cutscene modal
+                this.uiManager.showScreen('cutsceneModal');
+                
+                // Setup canvas
+                this.canvas = document.getElementById('cutsceneCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = GAME_CONFIG.CANVAS_WIDTH;
+                this.canvas.height = GAME_CONFIG.CANVAS_HEIGHT;
+                
+                // Set title
+                document.getElementById('cutsceneTitle').textContent = title;
+                
+                // Start animations based on type
+                this.startAnimation(type);
+                
+                // Start dialogue sequence
+                this.showNextDialogue(cutsceneData.dialogue);
+            }
+
+            startAnimation(type) {
+                // Create initial particles based on cutscene type
+                const colors = type === 'ending' ? 
+                    ['#FFD700', '#FFA500', '#FF69B4'] : 
+                    ['#667eea', '#764ba2', '#4ECDC4'];
+                
+                for (let i = 0; i < 50; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        color: colors[Math.floor(Math.random() * colors.length)],
+                        size: Math.random() * 3 + 1,
+                        alpha: Math.random() * 0.5 + 0.3
+                    });
+                }
+                
+                this.animate();
+            }
+
+            animate() {
+                if (!this.ctx) return;
+                
+                // Clear with fade effect
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // Update and draw particles
+                this.particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    // Wrap around
+                    if (p.x < 0) p.x = this.canvas.width;
+                    if (p.x > this.canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = this.canvas.height;
+                    if (p.y > this.canvas.height) p.y = 0;
+                    
+                    // Draw particle
+                    this.ctx.fillStyle = p.color;
+                    this.ctx.globalAlpha = p.alpha;
+                    this.ctx.beginPath();
+                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                });
+                
+                this.ctx.globalAlpha = 1;
+                
+                // Draw connecting lines
+                this.ctx.strokeStyle = 'rgba(102, 126, 234, 0.2)';
+                this.ctx.lineWidth = 1;
+                for (let i = 0; i < this.particles.length; i++) {
+                    for (let j = i + 1; j < this.particles.length; j++) {
+                        const dx = this.particles[i].x - this.particles[j].x;
+                        const dy = this.particles[i].y - this.particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (dist < 100) {
+                            this.ctx.globalAlpha = (100 - dist) / 100 * 0.3;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                            this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+                            this.ctx.stroke();
+                        }
+                    }
+                }
+                
+                this.ctx.globalAlpha = 1;
+                this.animationFrame = requestAnimationFrame(() => this.animate());
+            }
+
+            showNextDialogue(dialogueArray) {
+                if (this.currentDialogueIndex >= dialogueArray.length) {
+                    // Cutscene complete
+                    this.endCutscene();
+                    return;
+                }
+
+                const dialogue = dialogueArray[this.currentDialogueIndex];
+                const textElement = document.getElementById('cutsceneText');
+                
+                // Fade in text
+                textElement.style.opacity = '0';
+                textElement.textContent = dialogue.text;
+                
+                setTimeout(() => {
+                    textElement.style.transition = 'opacity 0.5s';
+                    textElement.style.opacity = '1';
+                }, 50);
+
+                this.currentDialogueIndex++;
+                
+                // Schedule next dialogue
+                this.dialogueTimeout = setTimeout(() => {
+                    this.showNextDialogue(dialogueArray);
+                }, dialogue.duration);
+            }
+
+            skipCutscene() {
+                if (this.dialogueTimeout) {
+                    clearTimeout(this.dialogueTimeout);
+                }
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                }
+                this.endCutscene();
+            }
+
+            endCutscene() {
+                if (this.animationFrame) {
+                    cancelAnimationFrame(this.animationFrame);
+                }
+                this.particles = [];
+                this.uiManager.showScreen('none');
+                if (this.onComplete) {
+                    this.onComplete();
+                }
+            }
+        }
+
+        // ============================================
+        // UI MANAGER
+        // ============================================
+        class UIManager {
+            updateGameUI(gameState) {
+                document.getElementById('score').textContent = `Score: ${gameState.score}`;
+                document.getElementById('combo').textContent = `Combo: x${gameState.combo}`;
+                document.getElementById('health').textContent = `Health: ${Math.max(0, Math.floor(gameState.health))}`;
+                document.getElementById('lives').textContent = `Lives: ${gameState.lives}`;
+                document.getElementById('wave').textContent = `Wave: ${gameState.wave}`;
+                
+                // Update combo animation
+                const comboEl = document.getElementById('combo');
+                if (gameState.combo > 0) {
+                    comboEl.classList.add('active');
+                    setTimeout(() => comboEl.classList.remove('active'), 300);
+                }
+                
+                // Update multiplayer UI
+                if (gameState.gameMode === 'multiplayer') {
+                    document.getElementById('p1Score').textContent = `Score: ${gameState.score}`;
+                    document.getElementById('p1Combo').textContent = `Combo: x${gameState.combo}`;
+                    document.getElementById('p2Score').textContent = `Score: ${gameState.player2Score}`;
+                    document.getElementById('p2Combo').textContent = `Combo: x${gameState.player2Combo}`;
+                }
+            }
+
+            updateStoryUI(gameState) {
+                if (gameState.gameMode === 'story') {
+                    const chapter = STORY_CHAPTERS[gameState.storyChapter];
+                    document.getElementById('chapterNum').textContent = gameState.storyChapter;
+                    document.getElementById('chapterTitle').textContent = chapter.title;
+                    document.getElementById('storyProgress').style.display = 'block';
+                    
+                    const storyText = document.getElementById('storyText');
+                    storyText.textContent = chapter.description;
+                    storyText.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        storyText.style.display = 'none';
+                    }, 5000);
+                } else {
+                    document.getElementById('storyProgress').style.display = 'none';
+                }
+            }
+
+            showScreen(screenId) {
+                document.querySelectorAll('.screen').forEach(screen => 
+                    screen.classList.add('hidden')
+                );
+                
+                if (screenId !== 'none') {
+                    const screen = document.getElementById(screenId);
+                    if (screen) {
+                        screen.classList.remove('hidden');
+                    }
+                }
+            }
+
+            updateStatsScreen(playerStats) {
+                document.getElementById('statHighScore').textContent = playerStats.highScore;
+                document.getElementById('statMaxCombo').textContent = `x${playerStats.maxCombo}`;
+                document.getElementById('statTotalEnemies').textContent = playerStats.totalEnemies;
+                document.getElementById('statAccuracy').textContent = `${playerStats.getAccuracy()}%`;
+                document.getElementById('statPerfectHits').textContent = playerStats.perfectHits;
+                document.getElementById('statGames').textContent = playerStats.gamesPlayed;
+            }
+
+            updateGameOverScreen(gameState) {
+                document.getElementById('finalScore').textContent = gameState.score;
+                document.getElementById('finalCombo').textContent = `x${gameState.maxCombo}`;
+                document.getElementById('finalWave').textContent = gameState.wave;
+                
+                const accuracy = gameState.totalHits + gameState.totalMisses > 0
+                    ? ((gameState.totalHits / (gameState.totalHits + gameState.totalMisses)) * 100).toFixed(1)
+                    : 0;
+                document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
+                
+                // Show next chapter button for story mode
+                if (gameState.gameMode === 'story' && gameState.storyChapter < 3) {
+                    document.getElementById('nextChapterBtn').style.display = 'block';
+                } else {
+                    document.getElementById('nextChapterBtn').style.display = 'none';
+                }
+            }
+
+            setClickZonesEnabled(enabled) {
+                const pointerEvents = enabled ? 'auto' : 'none';
+                document.querySelectorAll('.click-zone').forEach(zone => {
+                    zone.style.pointerEvents = pointerEvents;
+                });
+            }
+
+            showMultiplayerIndicators(show) {
+                const display = show ? 'block' : 'none';
+                document.getElementById('player1Indicator').style.display = display;
+                document.getElementById('player2Indicator').style.display = display;
+            }
+        }
+
+        // ============================================
+        // GAME CONTROLLER
+        // ============================================
+        class GameController {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = GAME_CONFIG.CANVAS_WIDTH;
+                this.canvas.height = GAME_CONFIG.CANVAS_HEIGHT;
+                
+                this.gameState = new GameState();
+                this.playerStats = new PlayerStats();
+                this.audioSystem = new AudioSystem();
+                this.renderer = new Renderer(this.canvas, this.ctx);
+                this.uiManager = new UIManager();
+                this.cutsceneManager = new CutsceneManager(this.uiManager);
+                this.spawnManager = new SpawnManager();
+                this.collisionManager = new CollisionManager(this.audioSystem);
+                this.waveManager = new WaveManager();
+                
+                // Create heroes
+                this.heroes = [
+                    new Hero(this.canvas, 0, false),
+                    new Hero(this.canvas, 1, false),
+                    new Hero(this.canvas, 2, false)
+                ];
+                
+                this.lastTime = 0;
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // Lane clicks
+                for (let i = 0; i < GAME_CONFIG.LANES; i++) {
+                    document.getElementById(`lane${i}`).addEventListener('click', () => {
+                        if (this.gameState.active && !this.gameState.paused) {
+                            this.handleLaneClick(i);
+                        }
+                    });
+                }
+                
+                // Keyboard
+                document.addEventListener('keydown', (e) => {
+                    this.handleKeyPress(e.key.toLowerCase());
+                });
+                
+                // Menu buttons
+                this.setupMenuButtons();
+            }
+
+            setupMenuButtons() {
+                // Arrow button
+                document.getElementById('arrowBtn').addEventListener('click', () => {
+                    if (this.gameState.active && !this.gameState.paused) {
+                        this.activateArrowMode();
+                    }
+                });
+                
+                // Main menu
+                document.getElementById('classicBtn').addEventListener('click', () => {
+                    this.uiManager.showScreen('modeSelect');
+                });
+                
+                document.getElementById('endlessBtn').addEventListener('click', () => {
+                    this.startGameWithCountdown('endless', 'normal');
+                });
+                
+                document.getElementById('multiplayerBtn').addEventListener('click', () => {
+                    this.startGameWithCountdown('multiplayer', 'normal');
+                });
+                
+                document.getElementById('storyBtn').addEventListener('click', () => {
+                    this.gameState.storyChapter = 1;
+                    this.uiManager.showScreen('storyIntro');
+                });
+                
+                document.getElementById('startStoryBtn').addEventListener('click', () => {
+                    this.startGameWithCountdown('story', 'normal');
+                });
+                
+                // Difficulty selection
+                document.querySelectorAll('[data-difficulty]').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        const difficulty = e.currentTarget.dataset.difficulty;
+                        this.startGameWithCountdown('classic', difficulty);
+                    });
+                });
+                
+                // Navigation
+                document.getElementById('backFromMode').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+                
+                document.getElementById('backFromStory').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+                
+                document.getElementById('statsBtn').addEventListener('click', () => {
+                    this.uiManager.updateStatsScreen(this.playerStats);
+                    this.uiManager.showScreen('stats');
+                });
+                
+                document.getElementById('backFromStats').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+                
+                document.getElementById('howToPlayBtn').addEventListener('click', () => {
+                    this.uiManager.showScreen('howToPlay');
+                });
+                
+                document.getElementById('backFromHowTo').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+                
+                // Cutscene controls
+                document.getElementById('skipCutsceneBtn').addEventListener('click', () => {
+                    this.cutsceneManager.skipCutscene();
+                });
+                
+                // Pause menu
+                document.getElementById('resumeBtn').addEventListener('click', () => {
+                    this.togglePause();
+                });
+                
+                document.getElementById('restartBtn').addEventListener('click', () => {
+                    this.uiManager.showScreen('none');
+                    this.startGameWithCountdown(this.gameState.gameMode, this.gameState.difficulty);
+                });
+                
+                document.getElementById('quitBtn').addEventListener('click', () => {
+                    this.gameState.active = false;
+                    this.gameState.paused = false;
+                    this.audioSystem.stopMusic();
+                    document.getElementById('arrowBtn').style.display = 'none';
+                    this.uiManager.showScreen('mainMenu');
+                });
+                
+                // Game over
+                document.getElementById('playAgainBtn').addEventListener('click', () => {
+                    this.startGameWithCountdown(this.gameState.gameMode, this.gameState.difficulty);
+                });
+                
+                document.getElementById('mainMenuBtn').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+                
+                document.getElementById('nextChapterBtn').addEventListener('click', () => {
+                    this.gameState.storyChapter++;
+                    if (this.gameState.storyChapter <= 3) {
+                        this.startGameWithCountdown('story', 'normal');
+                    } else {
+                        this.uiManager.showScreen('mainMenu');
+                    }
+                });
+            }
+
+            handleKeyPress(key) {
+                const binding = KEY_BINDINGS[key];
+                
+                if (binding === 'pause' && this.gameState.active) {
+                    this.togglePause();
+                } else if (typeof binding === 'number' && this.gameState.active && !this.gameState.paused) {
+                    this.handleLaneClick(binding);
+                }
+            }
+
+            handleLaneClick(lane) {
+                if (this.gameState.arrowMode) {
+                    // Arrow mode: shoot arrow down this lane
+                    this.shootArrow(lane);
+                } else {
+                    // Normal mode: melee attack
+                    this.collisionManager.handleLaneClick(lane, this.gameState, this.heroes);
+                    this.uiManager.updateGameUI(this.gameState);
+                }
+            }
+
+            togglePause() {
+                this.gameState.paused = !this.gameState.paused;
+                
+                const arrowBtn = document.getElementById('arrowBtn');
+                
+                if (this.gameState.paused) {
+                    this.uiManager.showScreen('pauseMenu');
+                    arrowBtn.style.display = 'none';
+                } else {
+                    this.uiManager.showScreen('none');
+                    arrowBtn.style.display = 'flex';
+                }
+            }
+
+            startGameWithCountdown(mode, difficulty) {
+                this.uiManager.showScreen('none');
+                this.gameState.gameMode = mode;
+                this.gameState.difficulty = difficulty;
+                
+                // Show opening cutscene for story mode
+                if (mode === 'story') {
+                    const chapter = STORY_CHAPTERS[this.gameState.storyChapter];
+                    this.cutsceneManager.playCutscene(
+                        chapter.openingCutscene,
+                        `Chapter ${this.gameState.storyChapter}: ${chapter.title}`,
+                        () => this.showCountdownAndStart(),
+                        'opening'
+                    );
+                } else {
+                    this.showCountdownAndStart();
+                }
+            }
+
+            showCountdownAndStart() {
+                const countdown = document.getElementById('countdown');
+                let count = GAME_CONFIG.COUNTDOWN_START;
+                countdown.textContent = count;
+                countdown.style.display = 'block';
+                
+                const countInterval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        countdown.textContent = count;
+                    } else {
+                        countdown.textContent = 'GO!';
+                        setTimeout(() => {
+                            countdown.style.display = 'none';
+                            this.startGame();
+                        }, 1000);
+                        clearInterval(countInterval);
+                    }
+                }, 1000);
+            }
+
+            startGame() {
+                this.gameState.reset();
+                this.gameState.active = true;
+                
+                const settings = this.gameState.getDifficultySettings();
+                this.gameState.health = GAME_CONFIG.BASE_HEALTH * settings.healthMultiplier;
+                this.gameState.maxHealth = this.gameState.health;
+                this.gameState.beatInterval = settings.spawnRate;
+                
+                this.uiManager.setClickZonesEnabled(true);
+                this.uiManager.showMultiplayerIndicators(this.gameState.gameMode === 'multiplayer');
+                this.uiManager.updateGameUI(this.gameState);
+                this.uiManager.updateStoryUI(this.gameState);
+                
+                // Show arrow button
+                document.getElementById('arrowBtn').style.display = 'flex';
+                
+                this.audioSystem.init();
+                this.audioSystem.startMusic(this.gameState);
+            }
+
+            shootArrow(lane) {
+                const hero = this.heroes[lane];
+                if (this.gameState.shootArrow(hero.x, hero.y)) {
+                    this.audioSystem.playTone(800, 0.1, 0.4, 'triangle');
+                    this.gameState.arrowMode = false;
+                    this.updateArrowButton();
+                    this.updateLaneIndicators();
+                }
+            }
+
+            activateArrowMode() {
+                if (this.gameState.canShootArrow()) {
+                    this.gameState.arrowMode = true;
+                    this.updateArrowButton();
+                    this.updateLaneIndicators();
+                }
+            }
+
+            updateLaneIndicators() {
+                const lanes = document.querySelectorAll('.click-zone');
+                if (this.gameState.arrowMode) {
+                    lanes.forEach(lane => lane.classList.add('arrow-target'));
+                } else {
+                    lanes.forEach(lane => lane.classList.remove('arrow-target'));
+                }
+            }
+
+            updateArrowButton() {
+                const arrowBtn = document.getElementById('arrowBtn');
+                const cooldownDisplay = document.getElementById('arrowCooldown');
+                
+                if (this.gameState.arrowMode) {
+                    // Arrow mode active - show pulsing golden button
+                    arrowBtn.classList.remove('cooldown');
+                    arrowBtn.classList.add('active');
+                    cooldownDisplay.textContent = '';
+                } else if (this.gameState.canShootArrow()) {
+                    // Ready to shoot
+                    arrowBtn.classList.remove('cooldown');
+                    arrowBtn.classList.remove('active');
+                    cooldownDisplay.textContent = '';
+                } else {
+                    // On cooldown
+                    arrowBtn.classList.add('cooldown');
+                    arrowBtn.classList.remove('active');
+                    const remaining = this.gameState.getArrowCooldownRemaining();
+                    if (remaining > 0) {
+                        cooldownDisplay.textContent = remaining;
+                    }
+                }
+            }
+
+            endGame() {
+                this.gameState.active = false;
+                this.audioSystem.stopMusic();
+                
+                this.playerStats.update(this.gameState);
+                this.uiManager.setClickZonesEnabled(false);
+                
+                // Show ending cutscene for story mode
+                if (this.gameState.gameMode === 'story') {
+                    const chapter = STORY_CHAPTERS[this.gameState.storyChapter];
+                    this.cutsceneManager.playCutscene(
+                        chapter.endingCutscene,
+                        `Chapter ${this.gameState.storyChapter} Complete!`,
+                        () => {
+                            this.uiManager.updateGameOverScreen(this.gameState);
+                            this.uiManager.showScreen('gameOver');
+                            document.getElementById('arrowBtn').style.display = 'none';
+                        },
+                        'ending'
+                    );
+                } else {
+                    this.uiManager.updateGameOverScreen(this.gameState);
+                    this.uiManager.showScreen('gameOver');
+                    document.getElementById('arrowBtn').style.display = 'none';
+                }
+            }
+
+            update(deltaTime) {
+                if (!this.gameState.active || this.gameState.paused) return;
+                
+                this.gameState.gameTime += deltaTime;
+                
+                // Update powerups
+                this.gameState.updatePowerups();
+                
+                // Update arrow button
+                this.updateArrowButton();
+                
+                // Spawn enemies
+                if (this.spawnManager.shouldSpawn(this.gameState, Date.now())) {
+                    this.spawnManager.spawnEnemy(this.gameState);
+                    this.spawnManager.maybeSpawnPowerup(this.gameState);
+                }
+                
+                // Update entities
+                this.gameState.enemies.forEach(enemy => enemy.update());
+                this.gameState.powerups.forEach(powerup => powerup.update());
+                
+                // Update arrows
+                this.gameState.arrows.forEach(arrow => arrow.update());
+                this.gameState.arrows = this.gameState.arrows.filter(arrow => !arrow.isOffScreen());
+                
+                // Update effects
+                this.gameState.particles = this.gameState.particles.filter(p => {
+                    p.update();
+                    return !p.isDead();
+                });
+                
+                this.gameState.slashEffects = this.gameState.slashEffects.filter(e => {
+                    e.update();
+                    return !e.isDead();
+                });
+                
+                this.gameState.missEffects = this.gameState.missEffects.filter(e => {
+                    e.update();
+                    return !e.isDead();
+                });
+                
+                this.gameState.beatIndicators = this.gameState.beatIndicators.filter(b => {
+                    b.life--;
+                    return b.life > 0;
+                });
+                
+                // Check collisions
+                this.collisionManager.checkArrowCollisions(this.gameState);
+                this.collisionManager.checkMissedEntities(this.gameState);
+                
+                // Check wave progression
+                if (this.waveManager.shouldAdvanceWave(this.gameState)) {
+                    const chapterComplete = this.waveManager.startNextWave(this.gameState);
+                    if (chapterComplete) {
+                        this.endGame();
+                        return;
+                    }
+                    this.uiManager.updateGameUI(this.gameState);
+                }
+                
+                // Check game over
+                if (this.gameState.isGameOver()) {
+                    this.endGame();
+                }
+            }
+
+            gameLoop(currentTime) {
+                const deltaTime = currentTime - this.lastTime;
+                this.lastTime = currentTime;
+                
+                this.update(deltaTime);
+                this.renderer.render(this.gameState, this.heroes);
+                
+                requestAnimationFrame((time) => this.gameLoop(time));
+            }
+
+            start() {
+                this.gameLoop(0);
+            }
+        }
+
+        // ============================================
+        // INITIALIZE GAME
+        // ============================================
+        const gameController = new GameController();
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            gameController.start();
+        });
+        
+        window.addEventListener('beforeunload', () => {
+            gameController.audioSystem.stopMusic();
+        });
+    </script>
+</body>
+</html>
