@@ -4,13 +4,8 @@ A rhythm based game
 A fast-paced rhythm-based action game where you defend against waves of enemies using perfectly timed attacks. Master the beat, build combos, and survive increasingly challenging waves!
 🎯 Features
 
-Rhythm-based Combat: Time your attacks to the beat for maximum damage
-Wave System: Progressive difficulty with increasingly challenging enemy patterns
-Combo System: Chain attacks together for score multipliers
 Story Mode: Follow the narrative as you progress through waves
 Power-ups: Collect shields and health to survive longer
-Boss Battles: Face powerful bosses with unique attack patterns
-Responsive Design: Playable on desktop and mobile devices
 
 🕹️ How to Play
 Controls
@@ -21,19 +16,9 @@ Enter: Start game or retry after game over
 
 Gameplay
 
-Enemies approach from the right side of the screen
-Attack when the beat indicator is in the green zone for perfect timing
-Chain successful attacks to build your combo multiplier
-Collect power-ups (shields and hearts) by attacking them
+Enemies approach from the up side of the screen
 Survive waves to progress through the story
-Defeat boss enemies to advance to new chapters
-
-Scoring
-
-Base points per enemy defeated
-Combo multiplier increases with consecutive perfect hits
-Bonus points for defeating bosses
-Higher waves = higher point values
+Defeat boss enemies to advance to next level
 
 🚀 Quick Start
 Play Online
@@ -78,13 +63,6 @@ Responsive: Adapts to different screen sizes
 Performance: Optimized canvas rendering with requestAnimationFrame
 
 📋 Game Mechanics
-Enemy Types
-
-Basic Enemies: Standard speed and health
-Fast Enemies: Quick but fragile
-Tank Enemies: Slow but high health
-Boss Enemies: Powerful adversaries with unique patterns
-
 Power-ups
 
 Shield: Grants temporary invincibility
@@ -108,7 +86,7 @@ Improve documentation
 📝 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 🎮 Credits
-Game Design & Development: [Your Name]
+Game Design & Development: []
 Font: Orbitron & Quicksand (Google Fonts)
 🌟 Support
 If you enjoy the game, please consider:
