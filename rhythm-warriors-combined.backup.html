@@ -19,8 +19,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         #gameContainer {
@@ -442,61 +441,6 @@
             z-index: 10;
             pointer-events: none;
         }
-
-        /* Notification Animations */
-        @keyframes notificationPop {
-            0% {
-                transform: translate(-50%, -50%) scale(0.5);
-                opacity: 0;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes notificationFade {
-            to {
-                transform: translate(-50%, -50%) scale(0.8);
-                opacity: 0;
-            }
-        }
-
-        /* Skin Hero Tabs */
-        .skin-hero-tab {
-            background: rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.7);
-            border: 2px solid rgba(102, 126, 234, 0.3);
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .skin-hero-tab:hover {
-            background: rgba(102, 126, 234, 0.3);
-            border-color: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .skin-hero-tab.active {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            border-color: #FFD700;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
-        }
-
-        .skin-hero-tab.locked {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 <body>
@@ -512,7 +456,6 @@
                 <div id="health">Health: 100</div>
                 <div id="lives">Lives: 3</div>
                 <div id="wave">Wave: 1</div>
-                <div id="coins" style="color: #FFD700;">💰 Coins: 0</div>
             </div>
         </div>
 
@@ -548,24 +491,11 @@
         <div id="mainMenu" class="screen">
             <h1>RHYTHM WARRIORS</h1>
             <p>Slash to the beat and defend the realm!</p>
-            <div style="display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; pointer-events: auto;">
-                <div style="background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; border: 2px solid #FFD700;">
-                    <span style="color: #FFD700; font-family: 'Orbitron', sans-serif; font-size: 18px;">💰 <span id="menuCoins">0</span> Coins</span>
-                </div>
-            </div>
             <div class="menu-buttons">
                 <button class="btn" id="classicBtn">Classic Mode</button>
                 <button class="btn" id="endlessBtn">Endless Mode</button>
                 <button class="btn" id="multiplayerBtn">Multiplayer</button>
                 <button class="btn" id="storyBtn">Story Mode</button>
-                <button class="btn" id="sideQuestsBtn" style="background: linear-gradient(45deg, #9B59B6, #8E44AD);">Side Quests</button>
-                <button class="btn" id="bossRushBtn" style="background: linear-gradient(45deg, #C0392B, #E74C3C);">Boss Rush</button>
-                <button class="btn" id="dailyChallengeBtn" style="background: linear-gradient(45deg, #F39C12, #E67E22);">Daily Challenge</button>
-                <button class="btn btn-secondary" id="shopBtn">🛒 Shop</button>
-                <button class="btn btn-secondary" id="heroesBtn">⚔️ Heroes</button>
-                <button class="btn btn-secondary" id="skinsBtn">🎭 Skins</button>
-                <button class="btn btn-secondary" id="upgradesBtn">⬆️ Upgrades</button>
-                <button class="btn btn-secondary" id="achievementsBtn">🏆 Achievements</button>
                 <button class="btn btn-secondary" id="statsBtn">Stats</button>
                 <button class="btn btn-secondary" id="howToPlayBtn">How to Play</button>
             </div>
@@ -701,111 +631,6 @@
             <button class="btn" id="backFromHowTo">Back</button>
         </div>
 
-        <!-- Shop Screen -->
-        <div id="shop" class="screen hidden">
-            <h2>🛒 Shop</h2>
-            <p>Purchase heroes and powerups with your hard-earned coins!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #FFD700; font-size: 24px; font-weight: bold;">💰 <span id="shopCoins">0</span> Coins</span>
-            </div>
-            <div id="shopContent" style="max-height: 400px; overflow-y: auto; padding: 20px;"></div>
-            <button class="btn" id="backFromShop">Back</button>
-        </div>
-
-        <!-- Heroes Screen -->
-        <div id="heroes" class="screen hidden">
-            <h2>⚔️ Heroes</h2>
-            <p>Select and unlock powerful heroes with unique abilities!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #FFD700; font-size: 24px; font-weight: bold;">💰 <span id="heroesCoins">0</span> Coins</span>
-            </div>
-            <div id="heroesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
-            <button class="btn" id="backFromHeroes">Back</button>
-        </div>
-
-        <!-- Skins Screen -->
-        <div id="skins" class="screen hidden">
-            <h2>🎭 Hero Skins</h2>
-            <p>Customize your heroes with unique skins!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #FFD700; font-size: 24px; font-weight: bold;">💰 <span id="skinsCoins">0</span> Coins</span>
-            </div>
-
-            <!-- Hero Selector Tabs -->
-            <div id="skinHeroTabs" style="display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap;">
-                <button class="skin-hero-tab active" data-hero="default">Rhythm Knight</button>
-                <button class="skin-hero-tab" data-hero="shadow">Shadow Dancer</button>
-                <button class="skin-hero-tab" data-hero="tank">Iron Guardian</button>
-                <button class="skin-hero-tab" data-hero="berserker">Berserker</button>
-                <button class="skin-hero-tab" data-hero="ancient">Ancient Sage</button>
-            </div>
-
-            <!-- Skins Grid -->
-            <div id="skinsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
-
-            <button class="btn" id="backFromSkins">Back</button>
-        </div>
-
-        <!-- Upgrades Screen -->
-        <div id="upgrades" class="screen hidden">
-            <h2>⬆️ Upgrades</h2>
-            <p>Enhance your warrior with permanent upgrades!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #FFD700; font-size: 24px; font-weight: bold;">💰 <span id="upgradesCoins">0</span> Coins</span>
-            </div>
-            <div id="upgradesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
-            <button class="btn" id="backFromUpgrades">Back</button>
-        </div>
-
-        <!-- Achievements Screen -->
-        <div id="achievementsScreen" class="screen hidden">
-            <h2>🏆 Achievements</h2>
-            <p>Complete challenges to earn coin rewards!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #4CAF50; font-size: 20px; font-weight: bold;">
-                    <span id="achievementProgress">0</span> / <span id="achievementTotal">0</span> Unlocked
-                </span>
-            </div>
-            <div id="achievementsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
-            <button class="btn" id="backFromAchievements">Back</button>
-        </div>
-
-        <!-- Daily Challenge Screen -->
-        <div id="dailyChallenge" class="screen hidden">
-            <h2>📅 Daily Challenge</h2>
-            <p>Complete today's challenge for bonus rewards!</p>
-            <div id="dailyChallengeContent" style="padding: 30px; max-width: 600px; margin: 0 auto;"></div>
-            <button class="btn" id="backFromDaily">Back</button>
-        </div>
-
-        <!-- Side Quests Screen -->
-        <div id="sideQuests" class="screen hidden">
-            <h2>🗺️ Side Quests</h2>
-            <p>Special missions with unique challenges and rewards!</p>
-            <div id="sideQuestsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; max-height: 450px; overflow-y: auto;"></div>
-            <button class="btn" id="backFromSideQuests">Back</button>
-        </div>
-
-        <!-- Boss Rush Screen -->
-        <div id="bossRush" class="screen hidden">
-            <h2>💀 Boss Rush</h2>
-            <p>Face all 5 story bosses back-to-back in the ultimate challenge!</p>
-            <div style="padding: 30px; max-width: 600px; margin: 0 auto;">
-                <div style="background: rgba(192, 57, 43, 0.2); border: 2px solid #C0392B; border-radius: 15px; padding: 25px; margin: 20px 0;">
-                    <h3 style="color: #FF4444; margin-bottom: 15px;">⚠️ EXTREME DIFFICULTY</h3>
-                    <p style="font-size: 16px; line-height: 1.8;">
-                        • Face 5 powerful bosses consecutively<br>
-                        • No breaks between battles<br>
-                        • One life per boss<br>
-                        • Reward: 💰 3000 Coins<br>
-                        • Difficulty: INSANE
-                    </p>
-                </div>
-                <button class="btn" id="startBossRush" style="font-size: 22px; padding: 15px 40px;">Accept Challenge</button>
-            </div>
-            <button class="btn btn-secondary" id="backFromBossRush">Back</button>
-        </div>
-
         <!-- Story Cutscene Modal -->
         <div id="cutsceneModal" class="screen hidden" style="background: #000;">
             <canvas id="cutsceneCanvas" style="width: 100%; height: 100%;"></canvas>
@@ -921,7 +746,6 @@
                 title: "The First Assault",
                 description: "Mysterious rhythmic creatures have appeared at the kingdom's gates...",
                 waves: 5,
-                reward: { coins: 300 },
                 openingCutscene: {
                     dialogue: [
                         { text: "In the kingdom of Harmonia, peace reigned for centuries...", duration: 3000 },
@@ -941,7 +765,6 @@
                 title: "The Demon Lord Rises",
                 description: "The attacks intensify. A powerful demon lord leads the invasion!",
                 waves: 8,
-                reward: { coins: 600 },
                 openingCutscene: {
                     dialogue: [
                         { text: "The enemies grow stronger.", duration: 3000 },
@@ -961,7 +784,6 @@
                 title: "Final Stand",
                 description: "This is it. Defeat the ultimate boss to save the realm!",
                 waves: 10,
-                reward: { coins: 1000, hero: 'shadow' },
                 openingCutscene: {
                     dialogue: [
                         { text: "The final confrontation is here.", duration: 3000 },
@@ -978,462 +800,6 @@
                         { text: "You are the true Rhythm Warrior!", duration: 3000 }
                     ]
                 }
-            },
-            4: {
-                title: "Echoes of Darkness",
-                description: "The Demon Lord's corruption left rifts in reality. Seal them before they spread!",
-                waves: 12,
-                reward: { coins: 1500, powerup: 'timeFreeze' },
-                openingCutscene: {
-                    dialogue: [
-                        { text: "Peace was short-lived...", duration: 3000 },
-                        { text: "Rifts in the fabric of reality tear open.", duration: 3000 },
-                        { text: "Echoes of the Demon Lord's power still linger.", duration: 3000 },
-                        { text: "You must seal these rifts before darkness returns!", duration: 3000 }
-                    ]
-                },
-                endingCutscene: {
-                    dialogue: [
-                        { text: "The rifts are sealed... for now.", duration: 2500 },
-                        { text: "But a greater threat is awakening...", duration: 2500 }
-                    ]
-                }
-            },
-            5: {
-                title: "The Ancient Awakening",
-                description: "An ancient evil, older than the kingdom itself, has awakened. This is the true final battle!",
-                waves: 15,
-                reward: { coins: 2500, hero: 'ancient' },
-                openingCutscene: {
-                    dialogue: [
-                        { text: "From the depths of time, something stirs...", duration: 3000 },
-                        { text: "An entity older than Harmonia itself awakens.", duration: 3000 },
-                        { text: "The Chaos Primordial rises!", duration: 3000 },
-                        { text: "This is the battle that will determine the fate of all existence!", duration: 3500 }
-                    ]
-                },
-                endingCutscene: {
-                    dialogue: [
-                        { text: "VICTORY! The Chaos Primordial is vanquished!", duration: 3000 },
-                        { text: "The timeline stabilizes. Reality is saved.", duration: 3000 },
-                        { text: "You have become a legend that transcends time itself.", duration: 3000 },
-                        { text: "Peace returns... but will it last?", duration: 3000 }
-                    ]
-                }
-            }
-        };
-
-        // ============================================
-        // PROGRESSION SYSTEM CONSTANTS
-        // ============================================
-
-        const HEROES = {
-            default: {
-                name: "Rhythm Knight",
-                description: "The original defender of Harmonia",
-                cost: 0,
-                unlocked: true,
-                color: '#FFD700',
-                bodyColor: '#FFA500',
-                ability: {
-                    name: "Balanced Strike",
-                    description: "Standard attacks with balanced power",
-                    stats: { damageMultiplier: 1.0, healthBonus: 0, cooldownReduction: 0 }
-                }
-            },
-            shadow: {
-                name: "Shadow Dancer",
-                description: "Master of speed and precision",
-                cost: 1000,
-                unlocked: false,
-                color: '#8B00FF',
-                bodyColor: '#4B0082',
-                ability: {
-                    name: "Swift Strike",
-                    description: "30% faster attacks, 20% less health",
-                    stats: { damageMultiplier: 1.2, healthBonus: -20, cooldownReduction: 0.3 }
-                }
-            },
-            tank: {
-                name: "Iron Guardian",
-                description: "Unstoppable defensive powerhouse",
-                cost: 800,
-                unlocked: false,
-                color: '#C0C0C0',
-                bodyColor: '#808080',
-                ability: {
-                    name: "Fortified Defense",
-                    description: "50% more health, 20% slower attacks",
-                    stats: { damageMultiplier: 0.8, healthBonus: 50, cooldownReduction: -0.2 }
-                }
-            },
-            berserker: {
-                name: "Berserker",
-                description: "High risk, high reward warrior",
-                cost: 1200,
-                unlocked: false,
-                color: '#FF0000',
-                bodyColor: '#8B0000',
-                ability: {
-                    name: "Rampage",
-                    description: "50% more damage, 30% less health",
-                    stats: { damageMultiplier: 1.5, healthBonus: -30, cooldownReduction: 0 }
-                }
-            },
-            ancient: {
-                name: "Ancient Sage",
-                description: "Legendary hero from beyond time",
-                cost: 2500,
-                unlocked: false,
-                color: '#00FFFF',
-                bodyColor: '#008B8B',
-                ability: {
-                    name: "Timeless Wisdom",
-                    description: "All stats increased by 25%",
-                    stats: { damageMultiplier: 1.25, healthBonus: 25, cooldownReduction: 0.25 }
-                }
-            }
-        };
-
-        // Hero Skins System
-        const HERO_SKINS = {
-            default: { // Rhythm Knight skins
-                default: {
-                    name: "Rhythm Knight",
-                    description: "Traditional armor of Harmonia's royal guards",
-                    cost: 0,
-                    unlocked: true,
-                    color: '#FFD700',
-                    bodyColor: '#FFA500',
-                    rarity: 'common'
-                },
-                neonVanguard: {
-                    name: "Neon Vanguard",
-                    description: "Crystallized rhythm energy channels",
-                    lore: "When the rifts opened, some warriors absorbed harmonic energy",
-                    cost: 1500,
-                    unlocked: false,
-                    color: '#00FFFF',
-                    bodyColor: '#000033',
-                    rarity: 'rare',
-                    unlockKey: 'chapter4'
-                },
-                goldenMaestro: {
-                    name: "Golden Maestro",
-                    description: "Ceremonial armor of the Conductor-General",
-                    lore: "Awarded to those who achieve perfect harmony",
-                    cost: 2000,
-                    unlocked: false,
-                    color: '#FFD700',
-                    bodyColor: '#FFFFFF',
-                    rarity: 'epic',
-                    unlockKey: 'perfectHits500'
-                },
-                festivalChampion: {
-                    name: "Festival Champion",
-                    description: "Ceremonial armor for the Festival of Beats",
-                    lore: "Celebrates the restoration of peace",
-                    cost: 0,
-                    unlocked: false,
-                    color: '#FF1493',
-                    bodyColor: '#FFD700',
-                    rarity: 'epic',
-                    unlockKey: 'chapter5'
-                }
-            },
-            shadow: {
-                default: {
-                    name: "Shadow Dancer",
-                    description: "Elite scout armor for speed and stealth",
-                    cost: 0,
-                    unlocked: true,
-                    color: '#8B00FF',
-                    bodyColor: '#4B0082',
-                    rarity: 'common'
-                },
-                voidAssassin: {
-                    name: "Void Assassin",
-                    description: "Merged with the void itself",
-                    lore: "Changed by the rifts but retained control",
-                    cost: 2200,
-                    unlocked: false,
-                    color: '#000000',
-                    bodyColor: '#8B00FF',
-                    rarity: 'epic',
-                    unlockKey: 'allSideQuests'
-                },
-                cyberNinja: {
-                    name: "Cyber Ninja",
-                    description: "Digital phantom with glitch powers",
-                    lore: "Weaponized reality glitches from Chapter 5",
-                    cost: 2500,
-                    unlocked: false,
-                    color: '#FF00FF',
-                    bodyColor: '#00FFFF',
-                    rarity: 'epic',
-                    unlockKey: 'chapter5'
-                }
-            },
-            tank: {
-                default: {
-                    name: "Iron Guardian",
-                    description: "Heavy armor from Harmonia's foundries",
-                    cost: 0,
-                    unlocked: true,
-                    color: '#C0C0C0',
-                    bodyColor: '#808080',
-                    rarity: 'common'
-                },
-                runicFortress: {
-                    name: "Runic Fortress",
-                    description: "Ancient stone armor with protection runes",
-                    lore: "Discovered in ruins, said to be unkillable",
-                    cost: 1800,
-                    unlocked: false,
-                    color: '#8B7355',
-                    bodyColor: '#00FF00',
-                    rarity: 'epic',
-                    unlockKey: 'games50'
-                },
-                moltenBulwark: {
-                    name: "Molten Bulwark",
-                    description: "Forged in volcanic fury",
-                    lore: "Living armor channeling earth's molten core",
-                    cost: 2800,
-                    unlocked: false,
-                    color: '#FF4500',
-                    bodyColor: '#8B0000',
-                    rarity: 'epic',
-                    unlockKey: 'bossRush'
-                }
-            },
-            berserker: {
-                default: {
-                    name: "Berserker",
-                    description: "Wild warriors from the northern tribes",
-                    cost: 0,
-                    unlocked: true,
-                    color: '#FF0000',
-                    bodyColor: '#8B0000',
-                    rarity: 'common'
-                },
-                bloodDrummer: {
-                    name: "Blood Drummer",
-                    description: "Tribal war drums shake the earth",
-                    lore: "Ancient tradition from before Harmonia",
-                    cost: 1600,
-                    unlocked: false,
-                    color: '#8B0000',
-                    bodyColor: '#FFD700',
-                    rarity: 'rare',
-                    unlockKey: 'combo50'
-                },
-                hellfireRavager: {
-                    name: "Hellfire Ravager",
-                    description: "Rage burns as literal flame",
-                    lore: "Purified Demon Lord technique",
-                    cost: 2400,
-                    unlocked: false,
-                    color: '#FF4500',
-                    bodyColor: '#FFD700',
-                    rarity: 'epic',
-                    unlockKey: 'enemies1000'
-                }
-            },
-            ancient: {
-                default: {
-                    name: "Ancient Sage",
-                    description: "Mysterious figure from beyond time",
-                    cost: 0,
-                    unlocked: true,
-                    color: '#00FFFF',
-                    bodyColor: '#008B8B',
-                    rarity: 'common'
-                },
-                astralArchivist: {
-                    name: "Astral Archivist",
-                    description: "Guardian of cosmic library",
-                    lore: "Maintains the archive of all rhythms",
-                    cost: 4000,
-                    unlocked: false,
-                    color: '#4B0082',
-                    bodyColor: '#FFD700',
-                    rarity: 'legendary',
-                    unlockKey: 'allAchievements'
-                },
-                celestialOracle: {
-                    name: "Celestial Oracle",
-                    description: "Hears the Music of the Spheres",
-                    lore: "Ascended form after perfect harmony",
-                    cost: 4500,
-                    unlocked: false,
-                    color: '#FFFFFF',
-                    bodyColor: '#FFD700',
-                    rarity: 'legendary',
-                    unlockKey: 'combo100'
-                }
-            }
-        };
-
-        const UPGRADES = {
-            maxHealth: {
-                name: "Max Health",
-                description: "Increase your maximum health",
-                maxLevel: 10,
-                baseCost: 100,
-                costMultiplier: 1.5,
-                effect: (level) => ({ health: 10 * level })
-            },
-            damage: {
-                name: "Attack Power",
-                description: "Increase damage dealt to enemies",
-                maxLevel: 10,
-                baseCost: 150,
-                costMultiplier: 1.6,
-                effect: (level) => ({ damageMultiplier: 1 + (level * 0.1) })
-            },
-            arrowCooldown: {
-                name: "Arrow Mastery",
-                description: "Reduce arrow cooldown time",
-                maxLevel: 5,
-                baseCost: 200,
-                costMultiplier: 2.0,
-                effect: (level) => ({ cooldownReduction: level * 0.15 })
-            },
-            startingLives: {
-                name: "Extra Lives",
-                description: "Start with more lives",
-                maxLevel: 3,
-                baseCost: 500,
-                costMultiplier: 2.5,
-                effect: (level) => ({ lives: level })
-            },
-            coinMultiplier: {
-                name: "Coin Magnet",
-                description: "Earn more coins from enemies",
-                maxLevel: 5,
-                baseCost: 300,
-                costMultiplier: 1.8,
-                effect: (level) => ({ coinMultiplier: 1 + (level * 0.2) })
-            },
-            comboMaster: {
-                name: "Combo Master",
-                description: "Combo multiplier increases faster",
-                maxLevel: 5,
-                baseCost: 250,
-                costMultiplier: 1.7,
-                effect: (level) => ({ comboBonus: level * 0.1 })
-            }
-        };
-
-        const ACHIEVEMENTS = {
-            firstBlood: { name: "First Blood", description: "Defeat your first enemy", reward: 50, condition: (stats) => stats.totalEnemies >= 1 },
-            centurion: { name: "Centurion", description: "Defeat 100 enemies", reward: 200, condition: (stats) => stats.totalEnemies >= 100 },
-            slayer: { name: "Slayer", description: "Defeat 500 enemies", reward: 500, condition: (stats) => stats.totalEnemies >= 500 },
-            legend: { name: "Legend", description: "Defeat 1000 enemies", reward: 1000, condition: (stats) => stats.totalEnemies >= 1000 },
-
-            comboNovice: { name: "Combo Novice", description: "Reach a 10x combo", reward: 100, condition: (stats) => stats.maxCombo >= 10 },
-            comboMaster: { name: "Combo Master", description: "Reach a 50x combo", reward: 300, condition: (stats) => stats.maxCombo >= 50 },
-            comboGod: { name: "Combo God", description: "Reach a 100x combo", reward: 800, condition: (stats) => stats.maxCombo >= 100 },
-
-            scoreApprentice: { name: "Score Apprentice", description: "Score 10,000 points", reward: 100, condition: (stats) => stats.highScore >= 10000 },
-            scoreExpert: { name: "Score Expert", description: "Score 50,000 points", reward: 400, condition: (stats) => stats.highScore >= 50000 },
-            scoreLegend: { name: "Score Legend", description: "Score 100,000 points", reward: 1000, condition: (stats) => stats.highScore >= 100000 },
-
-            perfectionist: { name: "Perfectionist", description: "Land 100 perfect hits", reward: 300, condition: (stats) => stats.perfectHits >= 100 },
-            sharpshooter: { name: "Sharpshooter", description: "Land 500 perfect hits", reward: 700, condition: (stats) => stats.perfectHits >= 500 },
-
-            survivor: { name: "Survivor", description: "Complete 10 waves", reward: 200, condition: (stats) => stats.wavesCompleted >= 10 },
-            veteran: { name: "Veteran", description: "Complete 50 waves", reward: 600, condition: (stats) => stats.wavesCompleted >= 50 },
-
-            storyBegin: { name: "The Journey Begins", description: "Complete Chapter 1", reward: 300, condition: (stats) => stats.chaptersCompleted >= 1 },
-            storyMid: { name: "Demon Slayer", description: "Complete Chapter 3", reward: 800, condition: (stats) => stats.chaptersCompleted >= 3 },
-            storyEnd: { name: "Legend of Harmonia", description: "Complete all 5 chapters", reward: 2000, condition: (stats) => stats.chaptersCompleted >= 5 },
-
-            dedicated: { name: "Dedicated Warrior", description: "Play 10 games", reward: 150, condition: (stats) => stats.gamesPlayed >= 10 },
-            addicted: { name: "Can't Stop Playing", description: "Play 50 games", reward: 500, condition: (stats) => stats.gamesPlayed >= 50 },
-
-            richMan: { name: "Wealthy Warrior", description: "Collect 10,000 coins total", reward: 1000, condition: (stats) => stats.totalCoins >= 10000 }
-        };
-
-        const DAILY_CHALLENGES = [
-            { name: "Speed Demon", description: "Complete 5 waves in under 3 minutes", reward: 500, condition: { type: 'time', waves: 5, time: 180 } },
-            { name: "Combo King", description: "Reach a 30x combo", reward: 300, condition: { type: 'combo', target: 30 } },
-            { name: "Perfect Warrior", description: "Land 50 perfect hits", reward: 400, condition: { type: 'perfectHits', target: 50 } },
-            { name: "Unstoppable", description: "Complete 10 waves without taking damage", reward: 800, condition: { type: 'noDamage', waves: 10 } },
-            { name: "Sharpshooter", description: "Defeat 30 enemies with arrows", reward: 350, condition: { type: 'arrowKills', target: 30 } },
-            { name: "Collector", description: "Collect 1000 coins in one run", reward: 400, condition: { type: 'coins', target: 1000 } },
-            { name: "Boss Slayer", description: "Defeat 3 bosses", reward: 600, condition: { type: 'bosses', target: 3 } }
-        ];
-
-        const SIDE_QUESTS = {
-            training: {
-                name: "Training Grounds",
-                description: "Practice your skills - No lives lost on failure",
-                difficulty: 'easy',
-                waves: 3,
-                reward: { coins: 200 },
-                special: 'practice'
-            },
-            treasure: {
-                name: "Treasure Hunt",
-                description: "Collect bonus coins! Enemies drop 3x coins",
-                difficulty: 'normal',
-                waves: 5,
-                reward: { coins: 800 },
-                special: 'extraCoins'
-            },
-            survival: {
-                name: "Survival Challenge",
-                description: "Survive as long as possible with 1 life",
-                difficulty: 'hard',
-                waves: 999,
-                reward: { coins: 1500 },
-                special: 'oneLife'
-            },
-            perfectRun: {
-                name: "Perfect Run",
-                description: "Complete 5 waves with 95%+ accuracy",
-                difficulty: 'hard',
-                waves: 5,
-                reward: { coins: 1000, powerup: 'perfectStrike' },
-                special: 'accuracy'
-            }
-        };
-
-        const BOSS_RUSH_CONFIG = {
-            name: "Boss Rush",
-            description: "Face all story bosses back-to-back!",
-            waves: 5, // One for each chapter boss
-            reward: { coins: 3000 },
-            difficulty: 'insane',
-            bossOnly: true
-        };
-
-        const EVENT_MODES = {
-            halloween: {
-                name: "Halloween Havoc",
-                description: "Spooky enemies and double rewards!",
-                active: false,
-                startDate: "10-01",
-                endDate: "11-01",
-                theme: { enemyColors: ['#FF6600', '#000000', '#8B00FF'], rewardMultiplier: 2 }
-            },
-            christmas: {
-                name: "Winter Wonderland",
-                description: "Festive enemies and bonus coins!",
-                active: false,
-                startDate: "12-01",
-                endDate: "12-31",
-                theme: { enemyColors: ['#FF0000', '#00FF00', '#FFFFFF'], coinMultiplier: 1.5 }
-            },
-            newYear: {
-                name: "New Year Bash",
-                description: "Celebrate with fireworks and triple XP!",
-                active: false,
-                startDate: "12-31",
-                endDate: "01-07",
-                theme: { particleExplosion: true, rewardMultiplier: 3 }
             }
         };
 
@@ -1491,8 +857,6 @@
                 this.slashEffects = [];
                 this.missEffects = [];
                 this.powerups = [];
-                this.coins = [];
-                this.coinsEarned = 0;
                 this.activePowerups = [];
                 this.bossFight = false;
                 this.gameTime = 0;
@@ -1509,8 +873,6 @@
                 this.arrowCooldown = 0;
                 this.arrowLastShot = 0;
                 this.arrowMode = false;
-                this.selectedHero = 'default';
-                this.sideQuestMode = null;
             }
 
             getDifficultySettings() {
@@ -1634,49 +996,12 @@
                     const saved = localStorage.getItem(GAME_CONFIG.STORAGE_KEY);
                     if (saved) {
                         Object.assign(this, JSON.parse(saved));
-                        this.ensureNewProperties();
                     } else {
                         this.reset();
                     }
                 } catch (error) {
                     console.error('Failed to load stats:', error);
                     this.reset();
-                }
-            }
-
-            ensureNewProperties() {
-                // Ensure new properties exist for players with old save data
-                if (this.coins === undefined) this.coins = 0;
-                if (this.totalCoins === undefined) this.totalCoins = 0;
-                if (this.unlockedHeroes === undefined) this.unlockedHeroes = { default: true };
-                if (this.selectedHero === undefined) this.selectedHero = 'default';
-                if (this.upgrades === undefined) this.upgrades = {};
-                if (this.unlockedAchievements === undefined) this.unlockedAchievements = {};
-                if (this.dailyChallengeDate === undefined) this.dailyChallengeDate = null;
-                if (this.dailyChallengeIndex === undefined) this.dailyChallengeIndex = 0;
-                if (this.dailyChallengeProgress === undefined) this.dailyChallengeProgress = {};
-                if (this.chaptersCompleted === undefined) this.chaptersCompleted = 0;
-                if (this.wavesCompleted === undefined) this.wavesCompleted = 0;
-                if (this.completedSideQuests === undefined) this.completedSideQuests = {};
-
-                // Skin system properties
-                if (this.unlockedSkins === undefined) {
-                    this.unlockedSkins = {
-                        default: { default: true },
-                        shadow: { default: true },
-                        tank: { default: true },
-                        berserker: { default: true },
-                        ancient: { default: true }
-                    };
-                }
-                if (this.selectedSkins === undefined) {
-                    this.selectedSkins = {
-                        default: 'default',
-                        shadow: 'default',
-                        tank: 'default',
-                        berserker: 'default',
-                        ancient: 'default'
-                    };
                 }
             }
 
@@ -1696,34 +1021,6 @@
                 this.totalMisses = 0;
                 this.perfectHits = 0;
                 this.gamesPlayed = 0;
-                this.coins = 0;
-                this.totalCoins = 0;
-                this.unlockedHeroes = { default: true };
-                this.selectedHero = 'default';
-                this.upgrades = {};
-                this.unlockedAchievements = {};
-                this.dailyChallengeDate = null;
-                this.dailyChallengeIndex = 0;
-                this.dailyChallengeProgress = {};
-                this.chaptersCompleted = 0;
-                this.wavesCompleted = 0;
-                this.completedSideQuests = {};
-
-                // Skin system reset
-                this.unlockedSkins = {
-                    default: { default: true },
-                    shadow: { default: true },
-                    tank: { default: true },
-                    berserker: { default: true },
-                    ancient: { default: true }
-                };
-                this.selectedSkins = {
-                    default: 'default',
-                    shadow: 'default',
-                    tank: 'default',
-                    berserker: 'default',
-                    ancient: 'default'
-                };
             }
 
             update(gameState) {
@@ -1734,283 +1031,7 @@
                 this.totalMisses += gameState.totalMisses;
                 this.perfectHits += gameState.perfectHits;
                 this.gamesPlayed++;
-                this.wavesCompleted += gameState.wave;
-
-                // Add coins earned during game
-                if (gameState.coinsEarned) {
-                    this.addCoins(gameState.coinsEarned);
-                }
-
-                // Check for achievements
-                this.checkAchievements();
-
                 this.save();
-            }
-
-            addCoins(amount) {
-                this.coins += amount;
-                this.totalCoins += amount;
-                this.save();
-            }
-
-            spendCoins(amount) {
-                if (this.coins >= amount) {
-                    this.coins -= amount;
-                    this.save();
-                    return true;
-                }
-                return false;
-            }
-
-            unlockHero(heroId) {
-                const hero = HEROES[heroId];
-                if (!hero || this.unlockedHeroes[heroId]) return false;
-
-                if (this.spendCoins(hero.cost)) {
-                    this.unlockedHeroes[heroId] = true;
-                    this.save();
-                    return true;
-                }
-                return false;
-            }
-
-            selectHero(heroId) {
-                if (this.unlockedHeroes[heroId]) {
-                    this.selectedHero = heroId;
-                    this.save();
-                    return true;
-                }
-                return false;
-            }
-
-            getUpgradeLevel(upgradeId) {
-                return this.upgrades[upgradeId] || 0;
-            }
-
-            getUpgradeCost(upgradeId) {
-                const upgrade = UPGRADES[upgradeId];
-                const level = this.getUpgradeLevel(upgradeId);
-                return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, level));
-            }
-
-            canUpgrade(upgradeId) {
-                const upgrade = UPGRADES[upgradeId];
-                const level = this.getUpgradeLevel(upgradeId);
-                return level < upgrade.maxLevel && this.coins >= this.getUpgradeCost(upgradeId);
-            }
-
-            purchaseUpgrade(upgradeId) {
-                if (!this.canUpgrade(upgradeId)) return false;
-
-                const cost = this.getUpgradeCost(upgradeId);
-                if (this.spendCoins(cost)) {
-                    this.upgrades[upgradeId] = (this.upgrades[upgradeId] || 0) + 1;
-                    this.save();
-                    return true;
-                }
-                return false;
-            }
-
-            checkAchievements() {
-                let coinsEarned = 0;
-
-                for (const [id, achievement] of Object.entries(ACHIEVEMENTS)) {
-                    if (!this.unlockedAchievements[id] && achievement.condition(this)) {
-                        this.unlockedAchievements[id] = true;
-                        coinsEarned += achievement.reward;
-                    }
-                }
-
-                if (coinsEarned > 0) {
-                    this.addCoins(coinsEarned);
-                    return coinsEarned;
-                }
-                return 0;
-            }
-
-            getDailyChallenge() {
-                const today = new Date().toDateString();
-                if (this.dailyChallengeDate !== today) {
-                    this.dailyChallengeDate = today;
-                    this.dailyChallengeIndex = Math.floor(Math.random() * DAILY_CHALLENGES.length);
-                    this.dailyChallengeProgress = {};
-                    this.save();
-                }
-                return DAILY_CHALLENGES[this.dailyChallengeIndex];
-            }
-
-            completeDailyChallenge() {
-                const challenge = this.getDailyChallenge();
-                this.addCoins(challenge.reward);
-                this.dailyChallengeProgress.completed = true;
-                this.save();
-            }
-
-            completeChapter(chapterNum) {
-                if (chapterNum > this.chaptersCompleted) {
-                    this.chaptersCompleted = chapterNum;
-
-                    // Award chapter rewards
-                    const chapter = STORY_CHAPTERS[chapterNum];
-                    if (chapter && chapter.reward) {
-                        if (chapter.reward.coins) {
-                            this.addCoins(chapter.reward.coins);
-                        }
-                        if (chapter.reward.hero) {
-                            this.unlockedHeroes[chapter.reward.hero] = true;
-                        }
-                    }
-
-                    this.save();
-                }
-            }
-
-            completeSideQuest(questId) {
-                if (!this.completedSideQuests[questId]) {
-                    this.completedSideQuests[questId] = true;
-
-                    const quest = SIDE_QUESTS[questId];
-                    if (quest && quest.reward) {
-                        if (quest.reward.coins) {
-                            this.addCoins(quest.reward.coins);
-                        }
-                    }
-
-                    this.save();
-                }
-            }
-
-            // ============================================
-            // SKIN SYSTEM METHODS
-            // ============================================
-
-            canUnlockSkin(heroId, skinId) {
-                const heroSkins = HERO_SKINS[heroId];
-                if (!heroSkins || !heroSkins[skinId]) return false;
-
-                const skin = heroSkins[skinId];
-
-                // Check if already unlocked
-                if (this.unlockedSkins[heroId] && this.unlockedSkins[heroId][skinId]) {
-                    return false;
-                }
-
-                // Check if unlock condition is met
-                if (skin.unlockKey) {
-                    switch(skin.unlockKey) {
-                        case 'chapter4':
-                            return this.chaptersCompleted >= 4;
-                        case 'chapter5':
-                            return this.chaptersCompleted >= 5;
-                        case 'allChapters':
-                            return this.chaptersCompleted >= 5;
-                        case 'perfectHits500':
-                            return this.perfectHits >= 500;
-                        case 'enemies1000':
-                            return this.totalEnemies >= 1000;
-                        case 'combo50':
-                            return this.maxCombo >= 50;
-                        case 'combo100':
-                            return this.maxCombo >= 100;
-                        case 'damage10000':
-                            return this.totalEnemies >= 100; // Approximation
-                        case 'health150':
-                            return this.getUpgradeLevel('maxHealth') >= 5;
-                        case 'waves10':
-                            return this.wavesCompleted >= 10;
-                        case 'bosses100':
-                            return this.totalEnemies >= 100; // Boss count approximation
-                        case 'sideQuests':
-                            return Object.keys(this.completedSideQuests).length >= 4;
-                        case 'bossRush':
-                            return this.completedSideQuests['bossRush'] === true;
-                        case 'games50':
-                            return this.gamesPlayed >= 50;
-                        case 'allAchievements':
-                            return Object.keys(this.unlockedAchievements).length >= 17;
-                        case 'maxUpgrades':
-                            return Object.values(this.upgrades).reduce((sum, lvl) => sum + lvl, 0) >= 38; // All max
-                        case 'dailyChallenge7':
-                            return this.dailyChallengeProgress.completedCount >= 7;
-                        default:
-                            return false;
-                    }
-                }
-
-                return true; // No unlock condition required
-            }
-
-            unlockSkin(heroId, skinId) {
-                const heroSkins = HERO_SKINS[heroId];
-                if (!heroSkins || !heroSkins[skinId]) return false;
-
-                const skin = heroSkins[skinId];
-
-                // Check if already unlocked
-                if (this.unlockedSkins[heroId] && this.unlockedSkins[heroId][skinId]) {
-                    return false;
-                }
-
-                // Check unlock conditions
-                if (!this.canUnlockSkin(heroId, skinId)) {
-                    return false;
-                }
-
-                // Check cost
-                if (skin.cost && !this.spendCoins(skin.cost)) {
-                    return false;
-                }
-
-                // Unlock the skin
-                if (!this.unlockedSkins[heroId]) {
-                    this.unlockedSkins[heroId] = {};
-                }
-                this.unlockedSkins[heroId][skinId] = true;
-                this.save();
-                return true;
-            }
-
-            selectSkin(heroId, skinId) {
-                // Check if skin is unlocked
-                if (!this.unlockedSkins[heroId] || !this.unlockedSkins[heroId][skinId]) {
-                    return false;
-                }
-
-                this.selectedSkins[heroId] = skinId;
-                this.save();
-                return true;
-            }
-
-            checkSkinUnlocks() {
-                // Auto-check all skins for unlock availability
-                const newUnlocks = [];
-
-                for (const [heroId, heroSkins] of Object.entries(HERO_SKINS)) {
-                    for (const [skinId, skin] of Object.entries(heroSkins)) {
-                        // Skip default skins
-                        if (skinId === 'default') continue;
-
-                        // Check if unlocked already
-                        if (this.unlockedSkins[heroId] && this.unlockedSkins[heroId][skinId]) {
-                            continue;
-                        }
-
-                        // Check if unlock condition is met and no cost required
-                        if (skin.unlockKey && this.canUnlockSkin(heroId, skinId) && !skin.cost) {
-                            if (!this.unlockedSkins[heroId]) {
-                                this.unlockedSkins[heroId] = {};
-                            }
-                            this.unlockedSkins[heroId][skinId] = true;
-                            newUnlocks.push({ heroId, skinId, name: skin.name });
-                        }
-                    }
-                }
-
-                if (newUnlocks.length > 0) {
-                    this.save();
-                }
-
-                return newUnlocks;
             }
 
             getAccuracy() {
@@ -2169,33 +1190,15 @@
         // ENTITY CLASSES
         // ============================================
         class Hero {
-            constructor(canvasRef, lane, isPlayer2 = false, playerStats = null) {
+            constructor(canvasRef, lane, isPlayer2 = false) {
                 this.canvas = canvasRef;
                 this.lane = lane;
                 this.isPlayer2 = isPlayer2;
                 this.size = GAME_CONFIG.HERO_SIZE;
                 this.attackAnimation = 0;
                 this.idleAnimation = 0;
-
-                // Apply skin colors if available
-                if (!isPlayer2 && playerStats) {
-                    const selectedHero = playerStats.selectedHero || 'default';
-                    const selectedSkin = playerStats.selectedSkins[selectedHero] || 'default';
-                    const heroSkins = HERO_SKINS[selectedHero];
-
-                    if (heroSkins && heroSkins[selectedSkin]) {
-                        const skin = heroSkins[selectedSkin];
-                        this.color = skin.color || COLORS.HERO_P1;
-                        this.bodyColor = skin.bodyColor || COLORS.HERO_P1_BODY;
-                    } else {
-                        this.color = COLORS.HERO_P1;
-                        this.bodyColor = COLORS.HERO_P1_BODY;
-                    }
-                } else {
-                    this.color = isPlayer2 ? COLORS.HERO_P2 : COLORS.HERO_P1;
-                    this.bodyColor = isPlayer2 ? COLORS.HERO_P2_BODY : COLORS.HERO_P1_BODY;
-                }
-
+                this.color = isPlayer2 ? COLORS.HERO_P2 : COLORS.HERO_P1;
+                this.bodyColor = isPlayer2 ? COLORS.HERO_P2_BODY : COLORS.HERO_P1_BODY;
                 this.updatePosition();
             }
 
@@ -2452,65 +1455,6 @@
             }
         }
 
-        class Coin {
-            constructor(x, y, value = 10) {
-                this.x = x;
-                this.y = y;
-                this.value = value;
-                this.size = 20;
-                this.speed = 2;
-                this.rotation = 0;
-                this.collected = false;
-                this.pulsePhase = Math.random() * Math.PI * 2;
-            }
-
-            update() {
-                this.y += this.speed;
-                this.rotation += 0.1;
-                this.pulsePhase += 0.1;
-            }
-
-            draw(ctx) {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.rotation);
-
-                const pulse = 1 + Math.sin(this.pulsePhase) * 0.2;
-                const size = this.size * pulse;
-
-                // Draw coin
-                ctx.fillStyle = '#FFD700';
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#FFD700';
-                ctx.beginPath();
-                ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Draw coin inner circle
-                ctx.fillStyle = '#FFA500';
-                ctx.beginPath();
-                ctx.arc(0, 0, size / 3, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Draw coin symbol
-                ctx.fillStyle = 'white';
-                ctx.font = `bold ${size * 0.8}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('$', 0, 0);
-
-                ctx.restore();
-            }
-
-            isPastTarget() {
-                return this.y > GAME_CONFIG.TARGET_LINE_Y + 100;
-            }
-
-            isAtTarget() {
-                return Math.abs(this.y - GAME_CONFIG.TARGET_LINE_Y) < GAME_CONFIG.GOOD_HIT_RANGE;
-            }
-        }
-
         class Particle {
             constructor(x, y, color) {
                 this.x = x;
@@ -2708,20 +1652,12 @@
                 this.currentWave = 1;
             }
 
-            getEnemyCount(wave, gameMode) {
-                // Boss rush mode: 1 boss per wave
-                if (gameMode === 'bossRush') {
-                    return 1;
-                }
-                return Math.floor(GAME_CONFIG.WAVE_REQUIREMENT_BASE *
+            getEnemyCount(wave) {
+                return Math.floor(GAME_CONFIG.WAVE_REQUIREMENT_BASE * 
                     Math.pow(GAME_CONFIG.WAVE_REQUIREMENT_MULTIPLIER, wave - 1));
             }
 
-            isBossWave(wave, gameMode) {
-                // Boss rush mode: every wave is a boss wave
-                if (gameMode === 'bossRush') {
-                    return true;
-                }
+            isBossWave(wave) {
                 return wave % GAME_CONFIG.BOSS_WAVE_INTERVAL === 0;
             }
 
@@ -2736,25 +1672,17 @@
 
             startNextWave(gameState) {
                 gameState.wave++;
-                gameState.waveEnemies = this.getEnemyCount(gameState.wave, gameState.gameMode);
+                gameState.waveEnemies = this.getEnemyCount(gameState.wave);
                 gameState.waveEnemiesDefeated = 0;
-                gameState.bossFight = this.isBossWave(gameState.wave, gameState.gameMode);
-
-                // Boss rush mode: ends after 5 bosses
-                if (gameState.gameMode === 'bossRush') {
-                    if (gameState.wave > 5) {
-                        return true; // Boss rush complete
-                    }
-                }
-
-                // Story mode: ends after chapter waves
+                gameState.bossFight = this.isBossWave(gameState.wave);
+                
                 if (gameState.gameMode === 'story') {
                     const chapter = STORY_CHAPTERS[gameState.storyChapter];
                     if (gameState.wave > chapter.waves) {
                         return true; // Chapter complete
                     }
                 }
-
+                
                 return false;
             }
         }
@@ -2854,17 +1782,13 @@
                                 gameState.score += score;
                                 gameState.incrementCombo();
                                 gameState.totalHits++;
-
+                                
                                 if (isPerfect) {
                                     gameState.perfectHits++;
                                 }
-
+                                
                                 gameState.waveEnemiesDefeated++;
                                 this.createParticles(gameState, enemy);
-
-                                // Spawn coins
-                                this.spawnCoins(gameState, enemy);
-
                                 gameState.enemies.splice(i, 1);
                             }
                             
@@ -2958,10 +1882,6 @@
                                 gameState.score += score;
                                 gameState.waveEnemiesDefeated++;
                                 this.createParticles(gameState, enemy);
-
-                                // Spawn coins
-                                this.spawnCoins(gameState, enemy);
-
                                 gameState.enemies.splice(j, 1);
                             }
                             
@@ -2975,39 +1895,6 @@
                     if (hit) {
                         gameState.arrows.splice(i, 1);
                     }
-                }
-            }
-
-            spawnCoins(gameState, enemy) {
-                // Determine coin value based on enemy type
-                const baseCoinValue = enemy.isBoss ? 50 : 10;
-                const coinCount = enemy.isBoss ? 3 : 1;
-
-                for (let i = 0; i < coinCount; i++) {
-                    gameState.coins.push(new Coin(enemy.x, enemy.y, baseCoinValue));
-                }
-            }
-
-            collectCoins(gameState) {
-                // Check for coin collection
-                for (let i = gameState.coins.length - 1; i >= 0; i--) {
-                    const coin = gameState.coins[i];
-
-                    if (coin.isAtTarget()) {
-                        // Auto-collect coins when they reach target line
-                        gameState.coinsEarned += coin.value;
-                        this.createCoinParticles(gameState, coin);
-                        gameState.coins.splice(i, 1);
-                    } else if (coin.isPastTarget()) {
-                        // Remove coins that are missed
-                        gameState.coins.splice(i, 1);
-                    }
-                }
-            }
-
-            createCoinParticles(gameState, coin) {
-                for (let i = 0; i < 10; i++) {
-                    gameState.particles.push(new Particle(coin.x, coin.y, '#FFD700'));
                 }
             }
         }
@@ -3087,7 +1974,6 @@
                 // Draw entities
                 gameState.enemies.forEach(enemy => enemy.draw(this.ctx));
                 gameState.powerups.forEach(powerup => powerup.draw(this.ctx));
-                gameState.coins.forEach(coin => coin.draw(this.ctx));
                 gameState.arrows.forEach(arrow => arrow.draw(this.ctx));
                 gameState.particles.forEach(particle => particle.draw(this.ctx));
                 gameState.slashEffects.forEach(effect => effect.draw(this.ctx));
@@ -3267,20 +2153,14 @@
                 document.getElementById('health').textContent = `Health: ${Math.max(0, Math.floor(gameState.health))}`;
                 document.getElementById('lives').textContent = `Lives: ${gameState.lives}`;
                 document.getElementById('wave').textContent = `Wave: ${gameState.wave}`;
-
-                // Update coins if element exists
-                const coinsEl = document.getElementById('coins');
-                if (coinsEl) {
-                    coinsEl.textContent = `💰 Coins: ${gameState.coinsEarned}`;
-                }
-
+                
                 // Update combo animation
                 const comboEl = document.getElementById('combo');
                 if (gameState.combo > 0) {
                     comboEl.classList.add('active');
                     setTimeout(() => comboEl.classList.remove('active'), 300);
                 }
-
+                
                 // Update multiplayer UI
                 if (gameState.gameMode === 'multiplayer') {
                     document.getElementById('p1Score').textContent = `Score: ${gameState.score}`;
@@ -3342,26 +2222,10 @@
                 document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
                 
                 // Show next chapter button for story mode
-                if (gameState.gameMode === 'story' && gameState.storyChapter < 5) {
+                if (gameState.gameMode === 'story' && gameState.storyChapter < 3) {
                     document.getElementById('nextChapterBtn').style.display = 'block';
                 } else {
                     document.getElementById('nextChapterBtn').style.display = 'none';
-                }
-
-                // Show coins earned
-                if (gameState.coinsEarned > 0) {
-                    const gameOverScreen = document.getElementById('gameOver');
-                    let coinsDisplay = gameOverScreen.querySelector('.coins-earned');
-                    if (!coinsDisplay) {
-                        coinsDisplay = document.createElement('div');
-                        coinsDisplay.className = 'coins-earned';
-                        coinsDisplay.style.cssText = 'color: #FFD700; font-size: 24px; margin: 20px 0; font-weight: bold;';
-                        const statsDiv = gameOverScreen.querySelector('div');
-                        if (statsDiv) {
-                            statsDiv.appendChild(coinsDisplay);
-                        }
-                    }
-                    coinsDisplay.textContent = `💰 Coins Earned: ${gameState.coinsEarned}`;
                 }
             }
 
@@ -3376,417 +2240,6 @@
                 const display = show ? 'block' : 'none';
                 document.getElementById('player1Indicator').style.display = display;
                 document.getElementById('player2Indicator').style.display = display;
-            }
-
-            updateCoinDisplays(playerStats) {
-                // Update all coin displays
-                const coins = playerStats.coins;
-                document.getElementById('menuCoins').textContent = coins;
-                if (document.getElementById('coins')) {
-                    document.getElementById('coins').textContent = `💰 Coins: ${coins}`;
-                }
-                if (document.getElementById('shopCoins')) {
-                    document.getElementById('shopCoins').textContent = coins;
-                }
-                if (document.getElementById('heroesCoins')) {
-                    document.getElementById('heroesCoins').textContent = coins;
-                }
-                if (document.getElementById('skinsCoins')) {
-                    document.getElementById('skinsCoins').textContent = coins;
-                }
-                if (document.getElementById('upgradesCoins')) {
-                    document.getElementById('upgradesCoins').textContent = coins;
-                }
-            }
-
-            populateHeroesScreen(playerStats) {
-                const grid = document.getElementById('heroesGrid');
-                grid.innerHTML = '';
-
-                for (const [id, hero] of Object.entries(HEROES)) {
-                    const isUnlocked = playerStats.unlockedHeroes[id];
-                    const isSelected = playerStats.selectedHero === id;
-
-                    const card = document.createElement('div');
-                    card.style.cssText = `
-                        background: ${isUnlocked ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.5)'};
-                        border: 3px solid ${isSelected ? '#FFD700' : (isUnlocked ? hero.color : '#555')};
-                        border-radius: 15px;
-                        padding: 20px;
-                        cursor: ${isUnlocked ? 'pointer' : 'default'};
-                        transition: all 0.3s;
-                        opacity: ${isUnlocked ? '1' : '0.6'};
-                        pointer-events: auto;
-                    `;
-
-                    card.innerHTML = `
-                        <div style="text-align: center;">
-                            <div style="width: 60px; height: 60px; background: ${hero.color}; border-radius: 50%; margin: 0 auto 15px; border: 3px solid ${hero.bodyColor};"></div>
-                            <h3 style="color: ${hero.color}; margin-bottom: 10px;">${hero.name}</h3>
-                            <p style="font-size: 12px; color: #ccc; margin-bottom: 10px;">${hero.description}</p>
-                            <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                                <div style="font-size: 11px; color: #FFD700; font-weight: bold;">${hero.ability.name}</div>
-                                <div style="font-size: 10px; color: #aaa;">${hero.ability.description}</div>
-                            </div>
-                            ${isUnlocked
-                                ? (isSelected ? '<div style="color: #FFD700; font-weight: bold;">✓ SELECTED</div>' : '<div style="color: #4CAF50;">Click to Select</div>')
-                                : `<div style="color: #FFD700; font-weight: bold;">💰 ${hero.cost} Coins</div>`
-                            }
-                        </div>
-                    `;
-
-                    if (isUnlocked) {
-                        card.addEventListener('click', () => {
-                            playerStats.selectHero(id);
-                            this.populateHeroesScreen(playerStats);
-                            this.updateCoinDisplays(playerStats);
-                        });
-                        card.addEventListener('mouseenter', () => {
-                            if (!isSelected) card.style.background = 'rgba(255,255,255,0.15)';
-                        });
-                        card.addEventListener('mouseleave', () => {
-                            if (!isSelected) card.style.background = 'rgba(255,255,255,0.1)';
-                        });
-                    } else {
-                        card.addEventListener('click', () => {
-                            if (playerStats.unlockHero(id)) {
-                                this.populateHeroesScreen(playerStats);
-                                this.updateCoinDisplays(playerStats);
-                                this.showNotification(`🎉 ${hero.name} Unlocked!`, '#4CAF50');
-                            } else {
-                                this.showNotification('Not enough coins!', '#FF4444');
-                            }
-                        });
-                    }
-
-                    grid.appendChild(card);
-                }
-            }
-
-            populateSkinsScreen(playerStats, selectedHeroForSkins = 'default') {
-                const grid = document.getElementById('skinsGrid');
-                grid.innerHTML = '';
-
-                // Update hero tabs
-                const tabs = document.querySelectorAll('.skin-hero-tab');
-                tabs.forEach(tab => {
-                    const heroId = tab.getAttribute('data-hero');
-                    const isUnlocked = playerStats.unlockedHeroes[heroId];
-
-                    tab.classList.toggle('active', heroId === selectedHeroForSkins);
-                    tab.classList.toggle('locked', !isUnlocked);
-
-                    tab.onclick = () => {
-                        if (isUnlocked) {
-                            this.populateSkinsScreen(playerStats, heroId);
-                        }
-                    };
-                });
-
-                // Get skins for selected hero
-                const heroSkins = HERO_SKINS[selectedHeroForSkins];
-                if (!heroSkins) return;
-
-                for (const [skinId, skin] of Object.entries(heroSkins)) {
-                    const isUnlocked = playerStats.unlockedSkins[selectedHeroForSkins]?.[skinId];
-                    const isSelected = playerStats.selectedSkins[selectedHeroForSkins] === skinId;
-                    const canUnlock = playerStats.canUnlockSkin(selectedHeroForSkins, skinId);
-
-                    const card = document.createElement('div');
-                    card.style.cssText = `
-                        background: ${isUnlocked ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.5)'};
-                        border: 3px solid ${isSelected ? '#FFD700' : (isUnlocked ? skin.color : '#555')};
-                        border-radius: 15px;
-                        padding: 20px;
-                        cursor: ${isUnlocked || canUnlock ? 'pointer' : 'default'};
-                        transition: all 0.3s;
-                        opacity: ${isUnlocked ? '1' : (canUnlock ? '0.8' : '0.5')};
-                        pointer-events: auto;
-                    `;
-
-                    const unlockText = () => {
-                        if (isUnlocked) {
-                            return isSelected
-                                ? '<div style="color: #FFD700; font-weight: bold;">✓ EQUIPPED</div>'
-                                : '<div style="color: #4CAF50;">Click to Equip</div>';
-                        } else if (canUnlock && skin.cost) {
-                            return `<div style="color: #FFD700; font-weight: bold;">💰 ${skin.cost} Coins - Click to Unlock</div>`;
-                        } else if (canUnlock && !skin.cost) {
-                            return '<div style="color: #4CAF50; font-weight: bold;">✨ Click to Unlock (Free!)</div>';
-                        } else {
-                            return `<div style="color: #FF6B6B; font-size: 11px;">🔒 ${getUnlockConditionText(skin.unlockKey)}</div>`;
-                        }
-                    };
-
-                    function getUnlockConditionText(key) {
-                        const conditions = {
-                            'chapter4': 'Complete Chapter 4',
-                            'chapter5': 'Complete Chapter 5',
-                            'allChapters': 'Complete All Chapters',
-                            'perfectHits500': 'Achieve 500 Perfect Hits',
-                            'enemies1000': 'Defeat 1000 Enemies',
-                            'combo50': 'Reach 50x Combo',
-                            'combo100': 'Reach 100x Combo',
-                            'waves10': 'Complete 10 Waves',
-                            'sideQuests': 'Complete All Side Quests',
-                            'bossRush': 'Complete Boss Rush',
-                            'games50': 'Play 50 Games',
-                            'allAchievements': 'Unlock All Achievements',
-                            'maxUpgrades': 'Max All Upgrades',
-                            'dailyChallenge7': 'Complete 7 Daily Challenges'
-                        };
-                        return conditions[key] || 'Unlock Condition Not Met';
-                    }
-
-                    card.innerHTML = `
-                        <div style="text-align: center;">
-                            <div style="width: 70px; height: 70px; background: ${skin.color}; border-radius: 50%; margin: 0 auto 15px; border: 4px solid ${skin.bodyColor}; box-shadow: 0 0 15px ${skin.color}40;"></div>
-                            <h3 style="color: ${skin.color}; margin-bottom: 8px; font-size: 18px;">${skin.name}</h3>
-                            ${skin.lore ? `<p style="font-size: 11px; color: #aaa; margin-bottom: 10px; font-style: italic;">"${skin.lore}"</p>` : ''}
-                            ${unlockText()}
-                        </div>
-                    `;
-
-                    if (isUnlocked) {
-                        // Select skin on click
-                        card.addEventListener('click', () => {
-                            playerStats.selectSkin(selectedHeroForSkins, skinId);
-                            this.populateSkinsScreen(playerStats, selectedHeroForSkins);
-                            this.showNotification(`🎭 ${skin.name} Equipped!`, skin.color);
-                        });
-                        card.addEventListener('mouseenter', () => {
-                            if (!isSelected) card.style.background = 'rgba(255,255,255,0.15)';
-                        });
-                        card.addEventListener('mouseleave', () => {
-                            if (!isSelected) card.style.background = 'rgba(255,255,255,0.1)';
-                        });
-                    } else if (canUnlock) {
-                        // Unlock skin on click
-                        card.addEventListener('click', () => {
-                            if (playerStats.unlockSkin(selectedHeroForSkins, skinId)) {
-                                this.populateSkinsScreen(playerStats, selectedHeroForSkins);
-                                this.updateCoinDisplays(playerStats);
-                                this.showNotification(`🎉 ${skin.name} Unlocked!`, skin.color);
-                            } else {
-                                this.showNotification('Not enough coins!', '#FF4444');
-                            }
-                        });
-                        card.addEventListener('mouseenter', () => {
-                            card.style.background = 'rgba(255,255,255,0.15)';
-                        });
-                        card.addEventListener('mouseleave', () => {
-                            card.style.background = 'rgba(0,0,0,0.5)';
-                        });
-                    }
-
-                    grid.appendChild(card);
-                }
-            }
-
-            populateUpgradesScreen(playerStats) {
-                const grid = document.getElementById('upgradesGrid');
-                grid.innerHTML = '';
-
-                for (const [id, upgrade] of Object.entries(UPGRADES)) {
-                    const currentLevel = playerStats.getUpgradeLevel(id);
-                    const cost = playerStats.getUpgradeCost(id);
-                    const canUpgrade = playerStats.canUpgrade(id);
-                    const maxed = currentLevel >= upgrade.maxLevel;
-
-                    const card = document.createElement('div');
-                    card.style.cssText = `
-                        background: rgba(255,255,255,0.1);
-                        border: 2px solid ${canUpgrade ? '#4CAF50' : '#555'};
-                        border-radius: 15px;
-                        padding: 20px;
-                        cursor: ${canUpgrade ? 'pointer' : 'default'};
-                        transition: all 0.3s;
-                        opacity: ${maxed ? '0.6' : '1'};
-                        pointer-events: auto;
-                    `;
-
-                    const effect = upgrade.effect(currentLevel + 1);
-                    const effectText = Object.entries(effect).map(([key, val]) => `${key}: +${val}`).join(', ');
-
-                    card.innerHTML = `
-                        <h3 style="color: #FFD700; margin-bottom: 10px;">${upgrade.name}</h3>
-                        <p style="font-size: 12px; color: #ccc; margin-bottom: 10px;">${upgrade.description}</p>
-                        <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span style="color: #4CAF50; font-weight: bold;">Level ${currentLevel}/${upgrade.maxLevel}</span>
-                                ${!maxed ? `<span style="color: #FFD700;">💰 ${cost}</span>` : '<span style="color: #4CAF50;">✓ MAXED</span>'}
-                            </div>
-                            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; margin-top: 8px; overflow: hidden;">
-                                <div style="width: ${(currentLevel / upgrade.maxLevel) * 100}%; height: 100%; background: linear-gradient(90deg, #4CAF50, #FFD700);"></div>
-                            </div>
-                        </div>
-                        ${!maxed ? `<div style="font-size: 11px; color: #aaa;">Next: ${effectText}</div>` : ''}
-                    `;
-
-                    if (canUpgrade && !maxed) {
-                        card.addEventListener('click', () => {
-                            if (playerStats.purchaseUpgrade(id)) {
-                                this.populateUpgradesScreen(playerStats);
-                                this.updateCoinDisplays(playerStats);
-                                this.showNotification(`⬆️ ${upgrade.name} upgraded!`, '#4CAF50');
-                            }
-                        });
-                        card.addEventListener('mouseenter', () => {
-                            card.style.background = 'rgba(76, 175, 80, 0.2)';
-                        });
-                        card.addEventListener('mouseleave', () => {
-                            card.style.background = 'rgba(255,255,255,0.1)';
-                        });
-                    }
-
-                    grid.appendChild(card);
-                }
-            }
-
-            populateAchievementsScreen(playerStats) {
-                const grid = document.getElementById('achievementsGrid');
-                grid.innerHTML = '';
-
-                let unlockedCount = 0;
-                const totalCount = Object.keys(ACHIEVEMENTS).length;
-
-                for (const [id, achievement] of Object.entries(ACHIEVEMENTS)) {
-                    const isUnlocked = playerStats.unlockedAchievements[id];
-                    if (isUnlocked) unlockedCount++;
-
-                    const card = document.createElement('div');
-                    card.style.cssText = `
-                        background: ${isUnlocked ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255,255,255,0.05)'};
-                        border: 2px solid ${isUnlocked ? '#4CAF50' : '#555'};
-                        border-radius: 12px;
-                        padding: 15px;
-                        opacity: ${isUnlocked ? '1' : '0.7'};
-                    `;
-
-                    card.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; align-items: start;">
-                            <div style="flex: 1;">
-                                <h4 style="color: ${isUnlocked ? '#FFD700' : '#ccc'}; margin-bottom: 5px; font-size: 14px;">${isUnlocked ? '✓' : '🔒'} ${achievement.name}</h4>
-                                <p style="font-size: 11px; color: #aaa;">${achievement.description}</p>
-                            </div>
-                            <div style="color: #FFD700; font-weight: bold; font-size: 14px; white-space: nowrap; margin-left: 10px;">
-                                ${isUnlocked ? '✓' : `💰 ${achievement.reward}`}
-                            </div>
-                        </div>
-                    `;
-
-                    grid.appendChild(card);
-                }
-
-                document.getElementById('achievementProgress').textContent = unlockedCount;
-                document.getElementById('achievementTotal').textContent = totalCount;
-            }
-
-            populateDailyChallengeScreen(playerStats) {
-                const content = document.getElementById('dailyChallengeContent');
-                const challenge = playerStats.getDailyChallenge();
-                const isCompleted = playerStats.dailyChallengeProgress.completed;
-
-                content.innerHTML = `
-                    <div style="background: rgba(241, 156, 18, 0.2); border: 2px solid #F39C12; border-radius: 15px; padding: 30px; text-align: center;">
-                        <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 32px;">📅 ${challenge.name}</h2>
-                        <p style="font-size: 18px; color: #fff; margin-bottom: 25px;">${challenge.description}</p>
-                        <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; margin: 20px 0;">
-                            <div style="color: #FFD700; font-size: 24px; font-weight: bold;">Reward: 💰 ${challenge.reward} Coins</div>
-                        </div>
-                        ${isCompleted
-                            ? '<div style="color: #4CAF50; font-size: 20px; font-weight: bold;">✓ COMPLETED TODAY!</div>'
-                            : '<div style="color: #FFF; font-size: 16px;">Complete this challenge in any game mode!</div>'
-                        }
-                    </div>
-                `;
-            }
-
-            populateSideQuestsScreen(playerStats) {
-                const grid = document.getElementById('sideQuestsGrid');
-                grid.innerHTML = '';
-
-                for (const [id, quest] of Object.entries(SIDE_QUESTS)) {
-                    const isCompleted = playerStats.completedSideQuests[id];
-
-                    const card = document.createElement('div');
-                    card.style.cssText = `
-                        background: ${isCompleted ? 'rgba(76, 175, 80, 0.2)' : 'rgba(155, 89, 182, 0.2)'};
-                        border: 2px solid ${isCompleted ? '#4CAF50' : '#9B59B6'};
-                        border-radius: 15px;
-                        padding: 20px;
-                        cursor: ${isCompleted ? 'default' : 'pointer'};
-                        transition: all 0.3s;
-                        pointer-events: auto;
-                    `;
-
-                    const difficultyColor = {
-                        easy: '#4CAF50',
-                        normal: '#FFA500',
-                        hard: '#FF4444',
-                        insane: '#8B00FF'
-                    }[quest.difficulty];
-
-                    card.innerHTML = `
-                        <h3 style="color: #FFD700; margin-bottom: 10px;">${quest.name}</h3>
-                        <p style="font-size: 12px; color: #ccc; margin-bottom: 15px;">${quest.description}</p>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
-                            <span style="color: ${difficultyColor}; font-weight: bold; text-transform: uppercase; font-size: 12px;">${quest.difficulty}</span>
-                            <span style="color: #FFD700; font-weight: bold;">💰 ${quest.reward.coins}</span>
-                        </div>
-                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
-                            ${isCompleted
-                                ? '<div style="color: #4CAF50; font-weight: bold; text-align: center;">✓ COMPLETED</div>'
-                                : '<div style="color: #FFF; font-weight: bold; text-align: center;">Click to Start</div>'
-                            }
-                        </div>
-                    `;
-
-                    if (!isCompleted) {
-                        card.addEventListener('click', () => {
-                            // Start side quest (will be handled by game controller)
-                            window.currentSideQuest = id;
-                            this.showScreen('modeSelect');
-                        });
-                        card.addEventListener('mouseenter', () => {
-                            card.style.background = 'rgba(155, 89, 182, 0.3)';
-                        });
-                        card.addEventListener('mouseleave', () => {
-                            card.style.background = 'rgba(155, 89, 182, 0.2)';
-                        });
-                    }
-
-                    grid.appendChild(card);
-                }
-            }
-
-            showNotification(message, color = '#FFD700') {
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: rgba(0,0,0,0.95);
-                    color: ${color};
-                    padding: 20px 40px;
-                    border-radius: 15px;
-                    border: 3px solid ${color};
-                    font-family: 'Orbitron', sans-serif;
-                    font-size: 24px;
-                    font-weight: bold;
-                    z-index: 9999;
-                    text-align: center;
-                    box-shadow: 0 10px 40px ${color}80;
-                    animation: notificationPop 0.3s ease;
-                `;
-                notification.textContent = message;
-                document.body.appendChild(notification);
-
-                setTimeout(() => {
-                    notification.style.animation = 'notificationFade 0.3s ease';
-                    setTimeout(() => notification.remove(), 300);
-                }, 2000);
             }
         }
 
@@ -3812,9 +2265,9 @@
                 
                 // Create heroes
                 this.heroes = [
-                    new Hero(this.canvas, 0, false, this.playerStats),
-                    new Hero(this.canvas, 1, false, this.playerStats),
-                    new Hero(this.canvas, 2, false, this.playerStats)
+                    new Hero(this.canvas, 0, false),
+                    new Hero(this.canvas, 1, false),
+                    new Hero(this.canvas, 2, false)
                 ];
                 
                 this.lastTime = 0;
@@ -3938,91 +2391,11 @@
                 
                 document.getElementById('nextChapterBtn').addEventListener('click', () => {
                     this.gameState.storyChapter++;
-                    if (this.gameState.storyChapter <= 5) {
+                    if (this.gameState.storyChapter <= 3) {
                         this.startGameWithCountdown('story', 'normal');
                     } else {
                         this.uiManager.showScreen('mainMenu');
                     }
-                });
-
-                // Progression system buttons
-                document.getElementById('heroesBtn').addEventListener('click', () => {
-                    this.uiManager.populateHeroesScreen(this.playerStats);
-                    this.uiManager.updateCoinDisplays(this.playerStats);
-                    this.uiManager.showScreen('heroes');
-                });
-
-                document.getElementById('backFromHeroes').addEventListener('click', () => {
-                    this.uiManager.showScreen('mainMenu');
-                    this.uiManager.updateCoinDisplays(this.playerStats);
-                });
-
-                document.getElementById('skinsBtn').addEventListener('click', () => {
-                    this.uiManager.populateSkinsScreen(this.playerStats);
-                    this.uiManager.updateCoinDisplays(this.playerStats);
-                    this.uiManager.showScreen('skins');
-                });
-
-                document.getElementById('backFromSkins').addEventListener('click', () => {
-                    this.uiManager.showScreen('mainMenu');
-                    this.uiManager.updateCoinDisplays(this.playerStats);
-                });
-
-                document.getElementById('upgradesBtn').addEventListener('click', () => {
-                    this.uiManager.populateUpgradesScreen(this.playerStats);
-                    this.uiManager.updateCoinDisplays(this.playerStats);
-                    this.uiManager.showScreen('upgrades');
-                });
-
-                document.getElementById('backFromUpgrades').addEventListener('click', () => {
-                    this.uiManager.showScreen('mainMenu');
-                    this.uiManager.updateCoinDisplays(this.playerStats);
-                });
-
-                document.getElementById('achievementsBtn').addEventListener('click', () => {
-                    this.uiManager.populateAchievementsScreen(this.playerStats);
-                    this.uiManager.showScreen('achievementsScreen');
-                });
-
-                document.getElementById('backFromAchievements').addEventListener('click', () => {
-                    this.uiManager.showScreen('mainMenu');
-                });
-
-                document.getElementById('dailyChallengeBtn').addEventListener('click', () => {
-                    this.uiManager.populateDailyChallengeScreen(this.playerStats);
-                    this.uiManager.showScreen('dailyChallenge');
-                });
-
-                document.getElementById('backFromDaily').addEventListener('click', () => {
-                    this.uiManager.showScreen('mainMenu');
-                });
-
-                document.getElementById('sideQuestsBtn').addEventListener('click', () => {
-                    this.uiManager.populateSideQuestsScreen(this.playerStats);
-                    this.uiManager.showScreen('sideQuests');
-                });
-
-                document.getElementById('backFromSideQuests').addEventListener('click', () => {
-                    this.uiManager.showScreen('mainMenu');
-                });
-
-                document.getElementById('bossRushBtn').addEventListener('click', () => {
-                    this.uiManager.showScreen('bossRush');
-                });
-
-                document.getElementById('backFromBossRush').addEventListener('click', () => {
-                    this.uiManager.showScreen('mainMenu');
-                });
-
-                document.getElementById('startBossRush').addEventListener('click', () => {
-                    this.gameState.gameMode = 'bossRush';
-                    this.gameState.difficulty = 'insane';
-                    this.startGameWithCountdown('bossRush', 'insane');
-                });
-
-                // Shop button (placeholder for future)
-                document.getElementById('shopBtn').addEventListener('click', () => {
-                    this.uiManager.showNotification('Shop coming soon!', '#FFA500');
                 });
             }
 
@@ -4104,50 +2477,20 @@
             startGame() {
                 this.gameState.reset();
                 this.gameState.active = true;
-
-                // Apply selected hero
-                this.gameState.selectedHero = this.playerStats.selectedHero;
-
-                // Apply difficulty settings
+                
                 const settings = this.gameState.getDifficultySettings();
-                let healthMultiplier = settings.healthMultiplier;
-                let damageMultiplier = 1;
-                let cooldownReduction = 0;
-
-                // Apply hero stat bonuses
-                const hero = HEROES[this.playerStats.selectedHero];
-                if (hero && hero.ability && hero.ability.stats) {
-                    healthMultiplier += hero.ability.stats.healthBonus / 100;
-                    damageMultiplier *= hero.ability.stats.damageMultiplier;
-                    cooldownReduction += hero.ability.stats.cooldownReduction;
-                }
-
-                // Apply upgrade bonuses
-                const maxHealthLevel = this.playerStats.getUpgradeLevel('maxHealth');
-                const damageLevel = this.playerStats.getUpgradeLevel('damage');
-                const arrowCooldownLevel = this.playerStats.getUpgradeLevel('arrowCooldown');
-                const startingLivesLevel = this.playerStats.getUpgradeLevel('startingLives');
-
-                this.gameState.health = (GAME_CONFIG.BASE_HEALTH + (maxHealthLevel * 10)) * healthMultiplier;
+                this.gameState.health = GAME_CONFIG.BASE_HEALTH * settings.healthMultiplier;
                 this.gameState.maxHealth = this.gameState.health;
-                this.gameState.lives = GAME_CONFIG.INITIAL_LIVES + startingLivesLevel;
                 this.gameState.beatInterval = settings.spawnRate;
-                this.gameState.damageMultiplier = damageMultiplier * (1 + (damageLevel * 0.1));
-                this.gameState.arrowCooldownMultiplier = 1 - (arrowCooldownLevel * 0.15) - cooldownReduction;
-
-                // Initialize wave enemies based on game mode
-                this.gameState.waveEnemies = this.waveManager.getEnemyCount(this.gameState.wave, this.gameState.gameMode);
-                this.gameState.bossFight = this.waveManager.isBossWave(this.gameState.wave, this.gameState.gameMode);
-
+                
                 this.uiManager.setClickZonesEnabled(true);
                 this.uiManager.showMultiplayerIndicators(this.gameState.gameMode === 'multiplayer');
                 this.uiManager.updateGameUI(this.gameState);
                 this.uiManager.updateStoryUI(this.gameState);
-                this.uiManager.updateCoinDisplays(this.playerStats);
-
+                
                 // Show arrow button
                 document.getElementById('arrowBtn').style.display = 'flex';
-
+                
                 this.audioSystem.init();
                 this.audioSystem.startMusic(this.gameState);
             }
@@ -4207,49 +2550,10 @@
             endGame() {
                 this.gameState.active = false;
                 this.audioSystem.stopMusic();
-
-                // Handle chapter completion
-                if (this.gameState.gameMode === 'story') {
-                    this.playerStats.completeChapter(this.gameState.storyChapter);
-                }
-
-                // Handle boss rush completion
-                if (this.gameState.gameMode === 'bossRush' && this.gameState.wave > 5) {
-                    this.playerStats.addCoins(3000);
-                    this.gameState.coinsEarned += 3000;
-                }
-
-                // Handle side quest completion
-                if (window.currentSideQuest) {
-                    this.playerStats.completeSideQuest(window.currentSideQuest);
-                    window.currentSideQuest = null;
-                }
-
+                
                 this.playerStats.update(this.gameState);
-
-                // Check for new achievements
-                const coinsFromAchievements = this.playerStats.checkAchievements();
-                if (coinsFromAchievements > 0) {
-                    setTimeout(() => {
-                        this.uiManager.showNotification(`🏆 Achievement Unlocked! +${coinsFromAchievements} coins`, '#4CAF50');
-                    }, 1000);
-                }
-
-                // Check for skin unlocks
-                const newSkins = this.playerStats.checkSkinUnlocks();
-                if (newSkins.length > 0) {
-                    setTimeout(() => {
-                        newSkins.forEach((skinInfo, index) => {
-                            setTimeout(() => {
-                                this.uiManager.showNotification(`🎭 New Skin Unlocked: ${skinInfo.name}!`, '#FFD700');
-                            }, index * 1500);
-                        });
-                    }, 2000);
-                }
-
                 this.uiManager.setClickZonesEnabled(false);
-                this.uiManager.updateCoinDisplays(this.playerStats);
-
+                
                 // Show ending cutscene for story mode
                 if (this.gameState.gameMode === 'story') {
                     const chapter = STORY_CHAPTERS[this.gameState.storyChapter];
@@ -4290,8 +2594,7 @@
                 // Update entities
                 this.gameState.enemies.forEach(enemy => enemy.update());
                 this.gameState.powerups.forEach(powerup => powerup.update());
-                this.gameState.coins.forEach(coin => coin.update());
-
+                
                 // Update arrows
                 this.gameState.arrows.forEach(arrow => arrow.update());
                 this.gameState.arrows = this.gameState.arrows.filter(arrow => !arrow.isOffScreen());
@@ -4320,7 +2623,6 @@
                 // Check collisions
                 this.collisionManager.checkArrowCollisions(this.gameState);
                 this.collisionManager.checkMissedEntities(this.gameState);
-                this.collisionManager.collectCoins(this.gameState);
                 
                 // Check wave progression
                 if (this.waveManager.shouldAdvanceWave(this.gameState)) {
@@ -4349,8 +2651,6 @@
             }
 
             start() {
-                // Update coin displays on load
-                this.uiManager.updateCoinDisplays(this.playerStats);
                 this.gameLoop(0);
             }
         }
