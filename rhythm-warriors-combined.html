@@ -441,6 +441,28 @@
             z-index: 10;
             pointer-events: none;
         }
+
+        /* Notification Animations */
+        @keyframes notificationPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes notificationFade {
+            to {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -841,6 +863,7 @@
                 title: "The First Assault",
                 description: "Mysterious rhythmic creatures have appeared at the kingdom's gates...",
                 waves: 5,
+                reward: { coins: 300 },
                 openingCutscene: {
                     dialogue: [
                         { text: "In the kingdom of Harmonia, peace reigned for centuries...", duration: 3000 },
@@ -860,6 +883,7 @@
                 title: "The Demon Lord Rises",
                 description: "The attacks intensify. A powerful demon lord leads the invasion!",
                 waves: 8,
+                reward: { coins: 600 },
                 openingCutscene: {
                     dialogue: [
                         { text: "The enemies grow stronger.", duration: 3000 },
@@ -2802,14 +2826,20 @@
                 document.getElementById('health').textContent = `Health: ${Math.max(0, Math.floor(gameState.health))}`;
                 document.getElementById('lives').textContent = `Lives: ${gameState.lives}`;
                 document.getElementById('wave').textContent = `Wave: ${gameState.wave}`;
-                
+
+                // Update coins if element exists
+                const coinsEl = document.getElementById('coins');
+                if (coinsEl) {
+                    coinsEl.textContent = `💰 Coins: ${gameState.coinsEarned}`;
+                }
+
                 // Update combo animation
                 const comboEl = document.getElementById('combo');
                 if (gameState.combo > 0) {
                     comboEl.classList.add('active');
                     setTimeout(() => comboEl.classList.remove('active'), 300);
                 }
-                
+
                 // Update multiplayer UI
                 if (gameState.gameMode === 'multiplayer') {
                     document.getElementById('p1Score').textContent = `Score: ${gameState.score}`;
@@ -2889,6 +2919,294 @@
                 const display = show ? 'block' : 'none';
                 document.getElementById('player1Indicator').style.display = display;
                 document.getElementById('player2Indicator').style.display = display;
+            }
+
+            updateCoinDisplays(playerStats) {
+                // Update all coin displays
+                const coins = playerStats.coins;
+                document.getElementById('menuCoins').textContent = coins;
+                if (document.getElementById('coins')) {
+                    document.getElementById('coins').textContent = `💰 Coins: ${coins}`;
+                }
+                if (document.getElementById('shopCoins')) {
+                    document.getElementById('shopCoins').textContent = coins;
+                }
+                if (document.getElementById('heroesCoins')) {
+                    document.getElementById('heroesCoins').textContent = coins;
+                }
+                if (document.getElementById('upgradesCoins')) {
+                    document.getElementById('upgradesCoins').textContent = coins;
+                }
+            }
+
+            populateHeroesScreen(playerStats) {
+                const grid = document.getElementById('heroesGrid');
+                grid.innerHTML = '';
+
+                for (const [id, hero] of Object.entries(HEROES)) {
+                    const isUnlocked = playerStats.unlockedHeroes[id];
+                    const isSelected = playerStats.selectedHero === id;
+
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: ${isUnlocked ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.5)'};
+                        border: 3px solid ${isSelected ? '#FFD700' : (isUnlocked ? hero.color : '#555')};
+                        border-radius: 15px;
+                        padding: 20px;
+                        cursor: ${isUnlocked ? 'pointer' : 'default'};
+                        transition: all 0.3s;
+                        opacity: ${isUnlocked ? '1' : '0.6'};
+                        pointer-events: auto;
+                    `;
+
+                    card.innerHTML = `
+                        <div style="text-align: center;">
+                            <div style="width: 60px; height: 60px; background: ${hero.color}; border-radius: 50%; margin: 0 auto 15px; border: 3px solid ${hero.bodyColor};"></div>
+                            <h3 style="color: ${hero.color}; margin-bottom: 10px;">${hero.name}</h3>
+                            <p style="font-size: 12px; color: #ccc; margin-bottom: 10px;">${hero.description}</p>
+                            <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                                <div style="font-size: 11px; color: #FFD700; font-weight: bold;">${hero.ability.name}</div>
+                                <div style="font-size: 10px; color: #aaa;">${hero.ability.description}</div>
+                            </div>
+                            ${isUnlocked
+                                ? (isSelected ? '<div style="color: #FFD700; font-weight: bold;">✓ SELECTED</div>' : '<div style="color: #4CAF50;">Click to Select</div>')
+                                : `<div style="color: #FFD700; font-weight: bold;">💰 ${hero.cost} Coins</div>`
+                            }
+                        </div>
+                    `;
+
+                    if (isUnlocked) {
+                        card.addEventListener('click', () => {
+                            playerStats.selectHero(id);
+                            this.populateHeroesScreen(playerStats);
+                            this.updateCoinDisplays(playerStats);
+                        });
+                        card.addEventListener('mouseenter', () => {
+                            if (!isSelected) card.style.background = 'rgba(255,255,255,0.15)';
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            if (!isSelected) card.style.background = 'rgba(255,255,255,0.1)';
+                        });
+                    } else {
+                        card.addEventListener('click', () => {
+                            if (playerStats.unlockHero(id)) {
+                                this.populateHeroesScreen(playerStats);
+                                this.updateCoinDisplays(playerStats);
+                                this.showNotification(`🎉 ${hero.name} Unlocked!`, '#4CAF50');
+                            } else {
+                                this.showNotification('Not enough coins!', '#FF4444');
+                            }
+                        });
+                    }
+
+                    grid.appendChild(card);
+                }
+            }
+
+            populateUpgradesScreen(playerStats) {
+                const grid = document.getElementById('upgradesGrid');
+                grid.innerHTML = '';
+
+                for (const [id, upgrade] of Object.entries(UPGRADES)) {
+                    const currentLevel = playerStats.getUpgradeLevel(id);
+                    const cost = playerStats.getUpgradeCost(id);
+                    const canUpgrade = playerStats.canUpgrade(id);
+                    const maxed = currentLevel >= upgrade.maxLevel;
+
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: rgba(255,255,255,0.1);
+                        border: 2px solid ${canUpgrade ? '#4CAF50' : '#555'};
+                        border-radius: 15px;
+                        padding: 20px;
+                        cursor: ${canUpgrade ? 'pointer' : 'default'};
+                        transition: all 0.3s;
+                        opacity: ${maxed ? '0.6' : '1'};
+                        pointer-events: auto;
+                    `;
+
+                    const effect = upgrade.effect(currentLevel + 1);
+                    const effectText = Object.entries(effect).map(([key, val]) => `${key}: +${val}`).join(', ');
+
+                    card.innerHTML = `
+                        <h3 style="color: #FFD700; margin-bottom: 10px;">${upgrade.name}</h3>
+                        <p style="font-size: 12px; color: #ccc; margin-bottom: 10px;">${upgrade.description}</p>
+                        <div style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 8px; margin: 10px 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="color: #4CAF50; font-weight: bold;">Level ${currentLevel}/${upgrade.maxLevel}</span>
+                                ${!maxed ? `<span style="color: #FFD700;">💰 ${cost}</span>` : '<span style="color: #4CAF50;">✓ MAXED</span>'}
+                            </div>
+                            <div style="width: 100%; height: 8px; background: rgba(0,0,0,0.5); border-radius: 4px; margin-top: 8px; overflow: hidden;">
+                                <div style="width: ${(currentLevel / upgrade.maxLevel) * 100}%; height: 100%; background: linear-gradient(90deg, #4CAF50, #FFD700);"></div>
+                            </div>
+                        </div>
+                        ${!maxed ? `<div style="font-size: 11px; color: #aaa;">Next: ${effectText}</div>` : ''}
+                    `;
+
+                    if (canUpgrade && !maxed) {
+                        card.addEventListener('click', () => {
+                            if (playerStats.purchaseUpgrade(id)) {
+                                this.populateUpgradesScreen(playerStats);
+                                this.updateCoinDisplays(playerStats);
+                                this.showNotification(`⬆️ ${upgrade.name} upgraded!`, '#4CAF50');
+                            }
+                        });
+                        card.addEventListener('mouseenter', () => {
+                            card.style.background = 'rgba(76, 175, 80, 0.2)';
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            card.style.background = 'rgba(255,255,255,0.1)';
+                        });
+                    }
+
+                    grid.appendChild(card);
+                }
+            }
+
+            populateAchievementsScreen(playerStats) {
+                const grid = document.getElementById('achievementsGrid');
+                grid.innerHTML = '';
+
+                let unlockedCount = 0;
+                const totalCount = Object.keys(ACHIEVEMENTS).length;
+
+                for (const [id, achievement] of Object.entries(ACHIEVEMENTS)) {
+                    const isUnlocked = playerStats.unlockedAchievements[id];
+                    if (isUnlocked) unlockedCount++;
+
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: ${isUnlocked ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255,255,255,0.05)'};
+                        border: 2px solid ${isUnlocked ? '#4CAF50' : '#555'};
+                        border-radius: 12px;
+                        padding: 15px;
+                        opacity: ${isUnlocked ? '1' : '0.7'};
+                    `;
+
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <h4 style="color: ${isUnlocked ? '#FFD700' : '#ccc'}; margin-bottom: 5px; font-size: 14px;">${isUnlocked ? '✓' : '🔒'} ${achievement.name}</h4>
+                                <p style="font-size: 11px; color: #aaa;">${achievement.description}</p>
+                            </div>
+                            <div style="color: #FFD700; font-weight: bold; font-size: 14px; white-space: nowrap; margin-left: 10px;">
+                                ${isUnlocked ? '✓' : `💰 ${achievement.reward}`}
+                            </div>
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                }
+
+                document.getElementById('achievementProgress').textContent = unlockedCount;
+                document.getElementById('achievementTotal').textContent = totalCount;
+            }
+
+            populateDailyChallengeScreen(playerStats) {
+                const content = document.getElementById('dailyChallengeContent');
+                const challenge = playerStats.getDailyChallenge();
+                const isCompleted = playerStats.dailyChallengeProgress.completed;
+
+                content.innerHTML = `
+                    <div style="background: rgba(241, 156, 18, 0.2); border: 2px solid #F39C12; border-radius: 15px; padding: 30px; text-align: center;">
+                        <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 32px;">📅 ${challenge.name}</h2>
+                        <p style="font-size: 18px; color: #fff; margin-bottom: 25px;">${challenge.description}</p>
+                        <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                            <div style="color: #FFD700; font-size: 24px; font-weight: bold;">Reward: 💰 ${challenge.reward} Coins</div>
+                        </div>
+                        ${isCompleted
+                            ? '<div style="color: #4CAF50; font-size: 20px; font-weight: bold;">✓ COMPLETED TODAY!</div>'
+                            : '<div style="color: #FFF; font-size: 16px;">Complete this challenge in any game mode!</div>'
+                        }
+                    </div>
+                `;
+            }
+
+            populateSideQuestsScreen(playerStats) {
+                const grid = document.getElementById('sideQuestsGrid');
+                grid.innerHTML = '';
+
+                for (const [id, quest] of Object.entries(SIDE_QUESTS)) {
+                    const isCompleted = playerStats.completedSideQuests[id];
+
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: ${isCompleted ? 'rgba(76, 175, 80, 0.2)' : 'rgba(155, 89, 182, 0.2)'};
+                        border: 2px solid ${isCompleted ? '#4CAF50' : '#9B59B6'};
+                        border-radius: 15px;
+                        padding: 20px;
+                        cursor: ${isCompleted ? 'default' : 'pointer'};
+                        transition: all 0.3s;
+                        pointer-events: auto;
+                    `;
+
+                    const difficultyColor = {
+                        easy: '#4CAF50',
+                        normal: '#FFA500',
+                        hard: '#FF4444',
+                        insane: '#8B00FF'
+                    }[quest.difficulty];
+
+                    card.innerHTML = `
+                        <h3 style="color: #FFD700; margin-bottom: 10px;">${quest.name}</h3>
+                        <p style="font-size: 12px; color: #ccc; margin-bottom: 15px;">${quest.description}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                            <span style="color: ${difficultyColor}; font-weight: bold; text-transform: uppercase; font-size: 12px;">${quest.difficulty}</span>
+                            <span style="color: #FFD700; font-weight: bold;">💰 ${quest.reward.coins}</span>
+                        </div>
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            ${isCompleted
+                                ? '<div style="color: #4CAF50; font-weight: bold; text-align: center;">✓ COMPLETED</div>'
+                                : '<div style="color: #FFF; font-weight: bold; text-align: center;">Click to Start</div>'
+                            }
+                        </div>
+                    `;
+
+                    if (!isCompleted) {
+                        card.addEventListener('click', () => {
+                            // Start side quest (will be handled by game controller)
+                            window.currentSideQuest = id;
+                            this.showScreen('modeSelect');
+                        });
+                        card.addEventListener('mouseenter', () => {
+                            card.style.background = 'rgba(155, 89, 182, 0.3)';
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            card.style.background = 'rgba(155, 89, 182, 0.2)';
+                        });
+                    }
+
+                    grid.appendChild(card);
+                }
+            }
+
+            showNotification(message, color = '#FFD700') {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0,0,0,0.95);
+                    color: ${color};
+                    padding: 20px 40px;
+                    border-radius: 15px;
+                    border: 3px solid ${color};
+                    font-family: 'Orbitron', sans-serif;
+                    font-size: 24px;
+                    font-weight: bold;
+                    z-index: 9999;
+                    text-align: center;
+                    box-shadow: 0 10px 40px ${color}80;
+                    animation: notificationPop 0.3s ease;
+                `;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'notificationFade 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 2000);
             }
         }
 
@@ -3040,11 +3358,80 @@
                 
                 document.getElementById('nextChapterBtn').addEventListener('click', () => {
                     this.gameState.storyChapter++;
-                    if (this.gameState.storyChapter <= 3) {
+                    if (this.gameState.storyChapter <= 5) {
                         this.startGameWithCountdown('story', 'normal');
                     } else {
                         this.uiManager.showScreen('mainMenu');
                     }
+                });
+
+                // Progression system buttons
+                document.getElementById('heroesBtn').addEventListener('click', () => {
+                    this.uiManager.populateHeroesScreen(this.playerStats);
+                    this.uiManager.updateCoinDisplays(this.playerStats);
+                    this.uiManager.showScreen('heroes');
+                });
+
+                document.getElementById('backFromHeroes').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                    this.uiManager.updateCoinDisplays(this.playerStats);
+                });
+
+                document.getElementById('upgradesBtn').addEventListener('click', () => {
+                    this.uiManager.populateUpgradesScreen(this.playerStats);
+                    this.uiManager.updateCoinDisplays(this.playerStats);
+                    this.uiManager.showScreen('upgrades');
+                });
+
+                document.getElementById('backFromUpgrades').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                    this.uiManager.updateCoinDisplays(this.playerStats);
+                });
+
+                document.getElementById('achievementsBtn').addEventListener('click', () => {
+                    this.uiManager.populateAchievementsScreen(this.playerStats);
+                    this.uiManager.showScreen('achievementsScreen');
+                });
+
+                document.getElementById('backFromAchievements').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+
+                document.getElementById('dailyChallengeBtn').addEventListener('click', () => {
+                    this.uiManager.populateDailyChallengeScreen(this.playerStats);
+                    this.uiManager.showScreen('dailyChallenge');
+                });
+
+                document.getElementById('backFromDaily').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+
+                document.getElementById('sideQuestsBtn').addEventListener('click', () => {
+                    this.uiManager.populateSideQuestsScreen(this.playerStats);
+                    this.uiManager.showScreen('sideQuests');
+                });
+
+                document.getElementById('backFromSideQuests').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+
+                document.getElementById('bossRushBtn').addEventListener('click', () => {
+                    this.uiManager.showScreen('bossRush');
+                });
+
+                document.getElementById('backFromBossRush').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                });
+
+                document.getElementById('startBossRush').addEventListener('click', () => {
+                    this.gameState.gameMode = 'bossRush';
+                    this.gameState.difficulty = 'insane';
+                    this.startGameWithCountdown('bossRush', 'insane');
+                });
+
+                // Shop button (placeholder for future)
+                document.getElementById('shopBtn').addEventListener('click', () => {
+                    this.uiManager.showNotification('Shop coming soon!', '#FFA500');
                 });
             }
 
@@ -3126,20 +3513,46 @@
             startGame() {
                 this.gameState.reset();
                 this.gameState.active = true;
-                
+
+                // Apply selected hero
+                this.gameState.selectedHero = this.playerStats.selectedHero;
+
+                // Apply difficulty settings
                 const settings = this.gameState.getDifficultySettings();
-                this.gameState.health = GAME_CONFIG.BASE_HEALTH * settings.healthMultiplier;
+                let healthMultiplier = settings.healthMultiplier;
+                let damageMultiplier = 1;
+                let cooldownReduction = 0;
+
+                // Apply hero stat bonuses
+                const hero = HEROES[this.playerStats.selectedHero];
+                if (hero && hero.ability && hero.ability.stats) {
+                    healthMultiplier += hero.ability.stats.healthBonus / 100;
+                    damageMultiplier *= hero.ability.stats.damageMultiplier;
+                    cooldownReduction += hero.ability.stats.cooldownReduction;
+                }
+
+                // Apply upgrade bonuses
+                const maxHealthLevel = this.playerStats.getUpgradeLevel('maxHealth');
+                const damageLevel = this.playerStats.getUpgradeLevel('damage');
+                const arrowCooldownLevel = this.playerStats.getUpgradeLevel('arrowCooldown');
+                const startingLivesLevel = this.playerStats.getUpgradeLevel('startingLives');
+
+                this.gameState.health = (GAME_CONFIG.BASE_HEALTH + (maxHealthLevel * 10)) * healthMultiplier;
                 this.gameState.maxHealth = this.gameState.health;
+                this.gameState.lives = GAME_CONFIG.INITIAL_LIVES + startingLivesLevel;
                 this.gameState.beatInterval = settings.spawnRate;
-                
+                this.gameState.damageMultiplier = damageMultiplier * (1 + (damageLevel * 0.1));
+                this.gameState.arrowCooldownMultiplier = 1 - (arrowCooldownLevel * 0.15) - cooldownReduction;
+
                 this.uiManager.setClickZonesEnabled(true);
                 this.uiManager.showMultiplayerIndicators(this.gameState.gameMode === 'multiplayer');
                 this.uiManager.updateGameUI(this.gameState);
                 this.uiManager.updateStoryUI(this.gameState);
-                
+                this.uiManager.updateCoinDisplays(this.playerStats);
+
                 // Show arrow button
                 document.getElementById('arrowBtn').style.display = 'flex';
-                
+
                 this.audioSystem.init();
                 this.audioSystem.startMusic(this.gameState);
             }
@@ -3199,10 +3612,31 @@
             endGame() {
                 this.gameState.active = false;
                 this.audioSystem.stopMusic();
-                
+
+                // Handle chapter completion
+                if (this.gameState.gameMode === 'story') {
+                    this.playerStats.completeChapter(this.gameState.storyChapter);
+                }
+
+                // Handle side quest completion
+                if (window.currentSideQuest) {
+                    this.playerStats.completeSideQuest(window.currentSideQuest);
+                    window.currentSideQuest = null;
+                }
+
                 this.playerStats.update(this.gameState);
+
+                // Check for new achievements
+                const coinsFromAchievements = this.playerStats.checkAchievements();
+                if (coinsFromAchievements > 0) {
+                    setTimeout(() => {
+                        this.uiManager.showNotification(`🏆 Achievement Unlocked! +${coinsFromAchievements} coins`, '#4CAF50');
+                    }, 1000);
+                }
+
                 this.uiManager.setClickZonesEnabled(false);
-                
+                this.uiManager.updateCoinDisplays(this.playerStats);
+
                 // Show ending cutscene for story mode
                 if (this.gameState.gameMode === 'story') {
                     const chapter = STORY_CHAPTERS[this.gameState.storyChapter];
@@ -3302,6 +3736,8 @@
             }
 
             start() {
+                // Update coin displays on load
+                this.uiManager.updateCoinDisplays(this.playerStats);
                 this.gameLoop(0);
             }
         }
