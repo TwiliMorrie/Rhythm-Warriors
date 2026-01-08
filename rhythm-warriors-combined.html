@@ -19,7 +19,8 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         #gameContainer {
@@ -2283,12 +2284,20 @@
                 this.currentWave = 1;
             }
 
-            getEnemyCount(wave) {
-                return Math.floor(GAME_CONFIG.WAVE_REQUIREMENT_BASE * 
+            getEnemyCount(wave, gameMode) {
+                // Boss rush mode: 1 boss per wave
+                if (gameMode === 'bossRush') {
+                    return 1;
+                }
+                return Math.floor(GAME_CONFIG.WAVE_REQUIREMENT_BASE *
                     Math.pow(GAME_CONFIG.WAVE_REQUIREMENT_MULTIPLIER, wave - 1));
             }
 
-            isBossWave(wave) {
+            isBossWave(wave, gameMode) {
+                // Boss rush mode: every wave is a boss wave
+                if (gameMode === 'bossRush') {
+                    return true;
+                }
                 return wave % GAME_CONFIG.BOSS_WAVE_INTERVAL === 0;
             }
 
@@ -2303,17 +2312,25 @@
 
             startNextWave(gameState) {
                 gameState.wave++;
-                gameState.waveEnemies = this.getEnemyCount(gameState.wave);
+                gameState.waveEnemies = this.getEnemyCount(gameState.wave, gameState.gameMode);
                 gameState.waveEnemiesDefeated = 0;
-                gameState.bossFight = this.isBossWave(gameState.wave);
-                
+                gameState.bossFight = this.isBossWave(gameState.wave, gameState.gameMode);
+
+                // Boss rush mode: ends after 5 bosses
+                if (gameState.gameMode === 'bossRush') {
+                    if (gameState.wave > 5) {
+                        return true; // Boss rush complete
+                    }
+                }
+
+                // Story mode: ends after chapter waves
                 if (gameState.gameMode === 'story') {
                     const chapter = STORY_CHAPTERS[gameState.storyChapter];
                     if (gameState.wave > chapter.waves) {
                         return true; // Chapter complete
                     }
                 }
-                
+
                 return false;
             }
         }
@@ -2901,10 +2918,26 @@
                 document.getElementById('finalAccuracy').textContent = `${accuracy}%`;
                 
                 // Show next chapter button for story mode
-                if (gameState.gameMode === 'story' && gameState.storyChapter < 3) {
+                if (gameState.gameMode === 'story' && gameState.storyChapter < 5) {
                     document.getElementById('nextChapterBtn').style.display = 'block';
                 } else {
                     document.getElementById('nextChapterBtn').style.display = 'none';
+                }
+
+                // Show coins earned
+                if (gameState.coinsEarned > 0) {
+                    const gameOverScreen = document.getElementById('gameOver');
+                    let coinsDisplay = gameOverScreen.querySelector('.coins-earned');
+                    if (!coinsDisplay) {
+                        coinsDisplay = document.createElement('div');
+                        coinsDisplay.className = 'coins-earned';
+                        coinsDisplay.style.cssText = 'color: #FFD700; font-size: 24px; margin: 20px 0; font-weight: bold;';
+                        const statsDiv = gameOverScreen.querySelector('div');
+                        if (statsDiv) {
+                            statsDiv.appendChild(coinsDisplay);
+                        }
+                    }
+                    coinsDisplay.textContent = `💰 Coins Earned: ${gameState.coinsEarned}`;
                 }
             }
 
@@ -3544,6 +3577,10 @@
                 this.gameState.damageMultiplier = damageMultiplier * (1 + (damageLevel * 0.1));
                 this.gameState.arrowCooldownMultiplier = 1 - (arrowCooldownLevel * 0.15) - cooldownReduction;
 
+                // Initialize wave enemies based on game mode
+                this.gameState.waveEnemies = this.waveManager.getEnemyCount(this.gameState.wave, this.gameState.gameMode);
+                this.gameState.bossFight = this.waveManager.isBossWave(this.gameState.wave, this.gameState.gameMode);
+
                 this.uiManager.setClickZonesEnabled(true);
                 this.uiManager.showMultiplayerIndicators(this.gameState.gameMode === 'multiplayer');
                 this.uiManager.updateGameUI(this.gameState);
@@ -3616,6 +3653,12 @@
                 // Handle chapter completion
                 if (this.gameState.gameMode === 'story') {
                     this.playerStats.completeChapter(this.gameState.storyChapter);
+                }
+
+                // Handle boss rush completion
+                if (this.gameState.gameMode === 'bossRush' && this.gameState.wave > 5) {
+                    this.playerStats.addCoins(3000);
+                    this.gameState.coinsEarned += 3000;
                 }
 
                 // Handle side quest completion
