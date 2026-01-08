@@ -464,6 +464,39 @@
                 opacity: 0;
             }
         }
+
+        /* Skin Hero Tabs */
+        .skin-hero-tab {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .skin-hero-tab:hover {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .skin-hero-tab.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-color: #FFD700;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
+        }
+
+        .skin-hero-tab.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -530,6 +563,7 @@
                 <button class="btn" id="dailyChallengeBtn" style="background: linear-gradient(45deg, #F39C12, #E67E22);">Daily Challenge</button>
                 <button class="btn btn-secondary" id="shopBtn">🛒 Shop</button>
                 <button class="btn btn-secondary" id="heroesBtn">⚔️ Heroes</button>
+                <button class="btn btn-secondary" id="skinsBtn">🎭 Skins</button>
                 <button class="btn btn-secondary" id="upgradesBtn">⬆️ Upgrades</button>
                 <button class="btn btn-secondary" id="achievementsBtn">🏆 Achievements</button>
                 <button class="btn btn-secondary" id="statsBtn">Stats</button>
@@ -687,6 +721,29 @@
             </div>
             <div id="heroesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
             <button class="btn" id="backFromHeroes">Back</button>
+        </div>
+
+        <!-- Skins Screen -->
+        <div id="skins" class="screen hidden">
+            <h2>🎭 Hero Skins</h2>
+            <p>Customize your heroes with unique skins!</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <span style="color: #FFD700; font-size: 24px; font-weight: bold;">💰 <span id="skinsCoins">0</span> Coins</span>
+            </div>
+
+            <!-- Hero Selector Tabs -->
+            <div id="skinHeroTabs" style="display: flex; justify-content: center; gap: 10px; margin: 20px 0; flex-wrap: wrap;">
+                <button class="skin-hero-tab active" data-hero="default">Rhythm Knight</button>
+                <button class="skin-hero-tab" data-hero="shadow">Shadow Dancer</button>
+                <button class="skin-hero-tab" data-hero="tank">Iron Guardian</button>
+                <button class="skin-hero-tab" data-hero="berserker">Berserker</button>
+                <button class="skin-hero-tab" data-hero="ancient">Ancient Sage</button>
+            </div>
+
+            <!-- Skins Grid -->
+            <div id="skinsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
+
+            <button class="btn" id="backFromSkins">Back</button>
         </div>
 
         <!-- Upgrades Screen -->
@@ -1034,6 +1091,186 @@
                     name: "Timeless Wisdom",
                     description: "All stats increased by 25%",
                     stats: { damageMultiplier: 1.25, healthBonus: 25, cooldownReduction: 0.25 }
+                }
+            }
+        };
+
+        // Hero Skins System
+        const HERO_SKINS = {
+            default: { // Rhythm Knight skins
+                default: {
+                    name: "Rhythm Knight",
+                    description: "Traditional armor of Harmonia's royal guards",
+                    cost: 0,
+                    unlocked: true,
+                    color: '#FFD700',
+                    bodyColor: '#FFA500',
+                    rarity: 'common'
+                },
+                neonVanguard: {
+                    name: "Neon Vanguard",
+                    description: "Crystallized rhythm energy channels",
+                    lore: "When the rifts opened, some warriors absorbed harmonic energy",
+                    cost: 1500,
+                    unlocked: false,
+                    color: '#00FFFF',
+                    bodyColor: '#000033',
+                    rarity: 'rare',
+                    unlockKey: 'chapter4'
+                },
+                goldenMaestro: {
+                    name: "Golden Maestro",
+                    description: "Ceremonial armor of the Conductor-General",
+                    lore: "Awarded to those who achieve perfect harmony",
+                    cost: 2000,
+                    unlocked: false,
+                    color: '#FFD700',
+                    bodyColor: '#FFFFFF',
+                    rarity: 'epic',
+                    unlockKey: 'perfectHits500'
+                },
+                festivalChampion: {
+                    name: "Festival Champion",
+                    description: "Ceremonial armor for the Festival of Beats",
+                    lore: "Celebrates the restoration of peace",
+                    cost: 0,
+                    unlocked: false,
+                    color: '#FF1493',
+                    bodyColor: '#FFD700',
+                    rarity: 'epic',
+                    unlockKey: 'chapter5'
+                }
+            },
+            shadow: {
+                default: {
+                    name: "Shadow Dancer",
+                    description: "Elite scout armor for speed and stealth",
+                    cost: 0,
+                    unlocked: true,
+                    color: '#8B00FF',
+                    bodyColor: '#4B0082',
+                    rarity: 'common'
+                },
+                voidAssassin: {
+                    name: "Void Assassin",
+                    description: "Merged with the void itself",
+                    lore: "Changed by the rifts but retained control",
+                    cost: 2200,
+                    unlocked: false,
+                    color: '#000000',
+                    bodyColor: '#8B00FF',
+                    rarity: 'epic',
+                    unlockKey: 'allSideQuests'
+                },
+                cyberNinja: {
+                    name: "Cyber Ninja",
+                    description: "Digital phantom with glitch powers",
+                    lore: "Weaponized reality glitches from Chapter 5",
+                    cost: 2500,
+                    unlocked: false,
+                    color: '#FF00FF',
+                    bodyColor: '#00FFFF',
+                    rarity: 'epic',
+                    unlockKey: 'chapter5'
+                }
+            },
+            tank: {
+                default: {
+                    name: "Iron Guardian",
+                    description: "Heavy armor from Harmonia's foundries",
+                    cost: 0,
+                    unlocked: true,
+                    color: '#C0C0C0',
+                    bodyColor: '#808080',
+                    rarity: 'common'
+                },
+                runicFortress: {
+                    name: "Runic Fortress",
+                    description: "Ancient stone armor with protection runes",
+                    lore: "Discovered in ruins, said to be unkillable",
+                    cost: 1800,
+                    unlocked: false,
+                    color: '#8B7355',
+                    bodyColor: '#00FF00',
+                    rarity: 'epic',
+                    unlockKey: 'games50'
+                },
+                moltenBulwark: {
+                    name: "Molten Bulwark",
+                    description: "Forged in volcanic fury",
+                    lore: "Living armor channeling earth's molten core",
+                    cost: 2800,
+                    unlocked: false,
+                    color: '#FF4500',
+                    bodyColor: '#8B0000',
+                    rarity: 'epic',
+                    unlockKey: 'bossRush'
+                }
+            },
+            berserker: {
+                default: {
+                    name: "Berserker",
+                    description: "Wild warriors from the northern tribes",
+                    cost: 0,
+                    unlocked: true,
+                    color: '#FF0000',
+                    bodyColor: '#8B0000',
+                    rarity: 'common'
+                },
+                bloodDrummer: {
+                    name: "Blood Drummer",
+                    description: "Tribal war drums shake the earth",
+                    lore: "Ancient tradition from before Harmonia",
+                    cost: 1600,
+                    unlocked: false,
+                    color: '#8B0000',
+                    bodyColor: '#FFD700',
+                    rarity: 'rare',
+                    unlockKey: 'combo50'
+                },
+                hellfireRavager: {
+                    name: "Hellfire Ravager",
+                    description: "Rage burns as literal flame",
+                    lore: "Purified Demon Lord technique",
+                    cost: 2400,
+                    unlocked: false,
+                    color: '#FF4500',
+                    bodyColor: '#FFD700',
+                    rarity: 'epic',
+                    unlockKey: 'enemies1000'
+                }
+            },
+            ancient: {
+                default: {
+                    name: "Ancient Sage",
+                    description: "Mysterious figure from beyond time",
+                    cost: 0,
+                    unlocked: true,
+                    color: '#00FFFF',
+                    bodyColor: '#008B8B',
+                    rarity: 'common'
+                },
+                astralArchivist: {
+                    name: "Astral Archivist",
+                    description: "Guardian of cosmic library",
+                    lore: "Maintains the archive of all rhythms",
+                    cost: 4000,
+                    unlocked: false,
+                    color: '#4B0082',
+                    bodyColor: '#FFD700',
+                    rarity: 'legendary',
+                    unlockKey: 'allAchievements'
+                },
+                celestialOracle: {
+                    name: "Celestial Oracle",
+                    description: "Hears the Music of the Spheres",
+                    lore: "Ascended form after perfect harmony",
+                    cost: 4500,
+                    unlocked: false,
+                    color: '#FFFFFF',
+                    bodyColor: '#FFD700',
+                    rarity: 'legendary',
+                    unlockKey: 'combo100'
                 }
             }
         };
@@ -1421,6 +1658,26 @@
                 if (this.chaptersCompleted === undefined) this.chaptersCompleted = 0;
                 if (this.wavesCompleted === undefined) this.wavesCompleted = 0;
                 if (this.completedSideQuests === undefined) this.completedSideQuests = {};
+
+                // Skin system properties
+                if (this.unlockedSkins === undefined) {
+                    this.unlockedSkins = {
+                        default: { default: true },
+                        shadow: { default: true },
+                        tank: { default: true },
+                        berserker: { default: true },
+                        ancient: { default: true }
+                    };
+                }
+                if (this.selectedSkins === undefined) {
+                    this.selectedSkins = {
+                        default: 'default',
+                        shadow: 'default',
+                        tank: 'default',
+                        berserker: 'default',
+                        ancient: 'default'
+                    };
+                }
             }
 
             save() {
@@ -1451,6 +1708,22 @@
                 this.chaptersCompleted = 0;
                 this.wavesCompleted = 0;
                 this.completedSideQuests = {};
+
+                // Skin system reset
+                this.unlockedSkins = {
+                    default: { default: true },
+                    shadow: { default: true },
+                    tank: { default: true },
+                    berserker: { default: true },
+                    ancient: { default: true }
+                };
+                this.selectedSkins = {
+                    default: 'default',
+                    shadow: 'default',
+                    tank: 'default',
+                    berserker: 'default',
+                    ancient: 'default'
+                };
             }
 
             update(gameState) {
@@ -1605,6 +1878,139 @@
 
                     this.save();
                 }
+            }
+
+            // ============================================
+            // SKIN SYSTEM METHODS
+            // ============================================
+
+            canUnlockSkin(heroId, skinId) {
+                const heroSkins = HERO_SKINS[heroId];
+                if (!heroSkins || !heroSkins[skinId]) return false;
+
+                const skin = heroSkins[skinId];
+
+                // Check if already unlocked
+                if (this.unlockedSkins[heroId] && this.unlockedSkins[heroId][skinId]) {
+                    return false;
+                }
+
+                // Check if unlock condition is met
+                if (skin.unlockKey) {
+                    switch(skin.unlockKey) {
+                        case 'chapter4':
+                            return this.chaptersCompleted >= 4;
+                        case 'chapter5':
+                            return this.chaptersCompleted >= 5;
+                        case 'allChapters':
+                            return this.chaptersCompleted >= 5;
+                        case 'perfectHits500':
+                            return this.perfectHits >= 500;
+                        case 'enemies1000':
+                            return this.totalEnemies >= 1000;
+                        case 'combo50':
+                            return this.maxCombo >= 50;
+                        case 'combo100':
+                            return this.maxCombo >= 100;
+                        case 'damage10000':
+                            return this.totalEnemies >= 100; // Approximation
+                        case 'health150':
+                            return this.getUpgradeLevel('maxHealth') >= 5;
+                        case 'waves10':
+                            return this.wavesCompleted >= 10;
+                        case 'bosses100':
+                            return this.totalEnemies >= 100; // Boss count approximation
+                        case 'sideQuests':
+                            return Object.keys(this.completedSideQuests).length >= 4;
+                        case 'bossRush':
+                            return this.completedSideQuests['bossRush'] === true;
+                        case 'games50':
+                            return this.gamesPlayed >= 50;
+                        case 'allAchievements':
+                            return Object.keys(this.unlockedAchievements).length >= 17;
+                        case 'maxUpgrades':
+                            return Object.values(this.upgrades).reduce((sum, lvl) => sum + lvl, 0) >= 38; // All max
+                        case 'dailyChallenge7':
+                            return this.dailyChallengeProgress.completedCount >= 7;
+                        default:
+                            return false;
+                    }
+                }
+
+                return true; // No unlock condition required
+            }
+
+            unlockSkin(heroId, skinId) {
+                const heroSkins = HERO_SKINS[heroId];
+                if (!heroSkins || !heroSkins[skinId]) return false;
+
+                const skin = heroSkins[skinId];
+
+                // Check if already unlocked
+                if (this.unlockedSkins[heroId] && this.unlockedSkins[heroId][skinId]) {
+                    return false;
+                }
+
+                // Check unlock conditions
+                if (!this.canUnlockSkin(heroId, skinId)) {
+                    return false;
+                }
+
+                // Check cost
+                if (skin.cost && !this.spendCoins(skin.cost)) {
+                    return false;
+                }
+
+                // Unlock the skin
+                if (!this.unlockedSkins[heroId]) {
+                    this.unlockedSkins[heroId] = {};
+                }
+                this.unlockedSkins[heroId][skinId] = true;
+                this.save();
+                return true;
+            }
+
+            selectSkin(heroId, skinId) {
+                // Check if skin is unlocked
+                if (!this.unlockedSkins[heroId] || !this.unlockedSkins[heroId][skinId]) {
+                    return false;
+                }
+
+                this.selectedSkins[heroId] = skinId;
+                this.save();
+                return true;
+            }
+
+            checkSkinUnlocks() {
+                // Auto-check all skins for unlock availability
+                const newUnlocks = [];
+
+                for (const [heroId, heroSkins] of Object.entries(HERO_SKINS)) {
+                    for (const [skinId, skin] of Object.entries(heroSkins)) {
+                        // Skip default skins
+                        if (skinId === 'default') continue;
+
+                        // Check if unlocked already
+                        if (this.unlockedSkins[heroId] && this.unlockedSkins[heroId][skinId]) {
+                            continue;
+                        }
+
+                        // Check if unlock condition is met and no cost required
+                        if (skin.unlockKey && this.canUnlockSkin(heroId, skinId) && !skin.cost) {
+                            if (!this.unlockedSkins[heroId]) {
+                                this.unlockedSkins[heroId] = {};
+                            }
+                            this.unlockedSkins[heroId][skinId] = true;
+                            newUnlocks.push({ heroId, skinId, name: skin.name });
+                        }
+                    }
+                }
+
+                if (newUnlocks.length > 0) {
+                    this.save();
+                }
+
+                return newUnlocks;
             }
 
             getAccuracy() {
@@ -1763,15 +2169,33 @@
         // ENTITY CLASSES
         // ============================================
         class Hero {
-            constructor(canvasRef, lane, isPlayer2 = false) {
+            constructor(canvasRef, lane, isPlayer2 = false, playerStats = null) {
                 this.canvas = canvasRef;
                 this.lane = lane;
                 this.isPlayer2 = isPlayer2;
                 this.size = GAME_CONFIG.HERO_SIZE;
                 this.attackAnimation = 0;
                 this.idleAnimation = 0;
-                this.color = isPlayer2 ? COLORS.HERO_P2 : COLORS.HERO_P1;
-                this.bodyColor = isPlayer2 ? COLORS.HERO_P2_BODY : COLORS.HERO_P1_BODY;
+
+                // Apply skin colors if available
+                if (!isPlayer2 && playerStats) {
+                    const selectedHero = playerStats.selectedHero || 'default';
+                    const selectedSkin = playerStats.selectedSkins[selectedHero] || 'default';
+                    const heroSkins = HERO_SKINS[selectedHero];
+
+                    if (heroSkins && heroSkins[selectedSkin]) {
+                        const skin = heroSkins[selectedSkin];
+                        this.color = skin.color || COLORS.HERO_P1;
+                        this.bodyColor = skin.bodyColor || COLORS.HERO_P1_BODY;
+                    } else {
+                        this.color = COLORS.HERO_P1;
+                        this.bodyColor = COLORS.HERO_P1_BODY;
+                    }
+                } else {
+                    this.color = isPlayer2 ? COLORS.HERO_P2 : COLORS.HERO_P1;
+                    this.bodyColor = isPlayer2 ? COLORS.HERO_P2_BODY : COLORS.HERO_P1_BODY;
+                }
+
                 this.updatePosition();
             }
 
@@ -2967,6 +3391,9 @@
                 if (document.getElementById('heroesCoins')) {
                     document.getElementById('heroesCoins').textContent = coins;
                 }
+                if (document.getElementById('skinsCoins')) {
+                    document.getElementById('skinsCoins').textContent = coins;
+                }
                 if (document.getElementById('upgradesCoins')) {
                     document.getElementById('upgradesCoins').textContent = coins;
                 }
@@ -3029,6 +3456,126 @@
                             } else {
                                 this.showNotification('Not enough coins!', '#FF4444');
                             }
+                        });
+                    }
+
+                    grid.appendChild(card);
+                }
+            }
+
+            populateSkinsScreen(playerStats, selectedHeroForSkins = 'default') {
+                const grid = document.getElementById('skinsGrid');
+                grid.innerHTML = '';
+
+                // Update hero tabs
+                const tabs = document.querySelectorAll('.skin-hero-tab');
+                tabs.forEach(tab => {
+                    const heroId = tab.getAttribute('data-hero');
+                    const isUnlocked = playerStats.unlockedHeroes[heroId];
+
+                    tab.classList.toggle('active', heroId === selectedHeroForSkins);
+                    tab.classList.toggle('locked', !isUnlocked);
+
+                    tab.onclick = () => {
+                        if (isUnlocked) {
+                            this.populateSkinsScreen(playerStats, heroId);
+                        }
+                    };
+                });
+
+                // Get skins for selected hero
+                const heroSkins = HERO_SKINS[selectedHeroForSkins];
+                if (!heroSkins) return;
+
+                for (const [skinId, skin] of Object.entries(heroSkins)) {
+                    const isUnlocked = playerStats.unlockedSkins[selectedHeroForSkins]?.[skinId];
+                    const isSelected = playerStats.selectedSkins[selectedHeroForSkins] === skinId;
+                    const canUnlock = playerStats.canUnlockSkin(selectedHeroForSkins, skinId);
+
+                    const card = document.createElement('div');
+                    card.style.cssText = `
+                        background: ${isUnlocked ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.5)'};
+                        border: 3px solid ${isSelected ? '#FFD700' : (isUnlocked ? skin.color : '#555')};
+                        border-radius: 15px;
+                        padding: 20px;
+                        cursor: ${isUnlocked || canUnlock ? 'pointer' : 'default'};
+                        transition: all 0.3s;
+                        opacity: ${isUnlocked ? '1' : (canUnlock ? '0.8' : '0.5')};
+                        pointer-events: auto;
+                    `;
+
+                    const unlockText = () => {
+                        if (isUnlocked) {
+                            return isSelected
+                                ? '<div style="color: #FFD700; font-weight: bold;">✓ EQUIPPED</div>'
+                                : '<div style="color: #4CAF50;">Click to Equip</div>';
+                        } else if (canUnlock && skin.cost) {
+                            return `<div style="color: #FFD700; font-weight: bold;">💰 ${skin.cost} Coins - Click to Unlock</div>`;
+                        } else if (canUnlock && !skin.cost) {
+                            return '<div style="color: #4CAF50; font-weight: bold;">✨ Click to Unlock (Free!)</div>';
+                        } else {
+                            return `<div style="color: #FF6B6B; font-size: 11px;">🔒 ${getUnlockConditionText(skin.unlockKey)}</div>`;
+                        }
+                    };
+
+                    function getUnlockConditionText(key) {
+                        const conditions = {
+                            'chapter4': 'Complete Chapter 4',
+                            'chapter5': 'Complete Chapter 5',
+                            'allChapters': 'Complete All Chapters',
+                            'perfectHits500': 'Achieve 500 Perfect Hits',
+                            'enemies1000': 'Defeat 1000 Enemies',
+                            'combo50': 'Reach 50x Combo',
+                            'combo100': 'Reach 100x Combo',
+                            'waves10': 'Complete 10 Waves',
+                            'sideQuests': 'Complete All Side Quests',
+                            'bossRush': 'Complete Boss Rush',
+                            'games50': 'Play 50 Games',
+                            'allAchievements': 'Unlock All Achievements',
+                            'maxUpgrades': 'Max All Upgrades',
+                            'dailyChallenge7': 'Complete 7 Daily Challenges'
+                        };
+                        return conditions[key] || 'Unlock Condition Not Met';
+                    }
+
+                    card.innerHTML = `
+                        <div style="text-align: center;">
+                            <div style="width: 70px; height: 70px; background: ${skin.color}; border-radius: 50%; margin: 0 auto 15px; border: 4px solid ${skin.bodyColor}; box-shadow: 0 0 15px ${skin.color}40;"></div>
+                            <h3 style="color: ${skin.color}; margin-bottom: 8px; font-size: 18px;">${skin.name}</h3>
+                            ${skin.lore ? `<p style="font-size: 11px; color: #aaa; margin-bottom: 10px; font-style: italic;">"${skin.lore}"</p>` : ''}
+                            ${unlockText()}
+                        </div>
+                    `;
+
+                    if (isUnlocked) {
+                        // Select skin on click
+                        card.addEventListener('click', () => {
+                            playerStats.selectSkin(selectedHeroForSkins, skinId);
+                            this.populateSkinsScreen(playerStats, selectedHeroForSkins);
+                            this.showNotification(`🎭 ${skin.name} Equipped!`, skin.color);
+                        });
+                        card.addEventListener('mouseenter', () => {
+                            if (!isSelected) card.style.background = 'rgba(255,255,255,0.15)';
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            if (!isSelected) card.style.background = 'rgba(255,255,255,0.1)';
+                        });
+                    } else if (canUnlock) {
+                        // Unlock skin on click
+                        card.addEventListener('click', () => {
+                            if (playerStats.unlockSkin(selectedHeroForSkins, skinId)) {
+                                this.populateSkinsScreen(playerStats, selectedHeroForSkins);
+                                this.updateCoinDisplays(playerStats);
+                                this.showNotification(`🎉 ${skin.name} Unlocked!`, skin.color);
+                            } else {
+                                this.showNotification('Not enough coins!', '#FF4444');
+                            }
+                        });
+                        card.addEventListener('mouseenter', () => {
+                            card.style.background = 'rgba(255,255,255,0.15)';
+                        });
+                        card.addEventListener('mouseleave', () => {
+                            card.style.background = 'rgba(0,0,0,0.5)';
                         });
                     }
 
@@ -3265,9 +3812,9 @@
                 
                 // Create heroes
                 this.heroes = [
-                    new Hero(this.canvas, 0, false),
-                    new Hero(this.canvas, 1, false),
-                    new Hero(this.canvas, 2, false)
+                    new Hero(this.canvas, 0, false, this.playerStats),
+                    new Hero(this.canvas, 1, false, this.playerStats),
+                    new Hero(this.canvas, 2, false, this.playerStats)
                 ];
                 
                 this.lastTime = 0;
@@ -3406,6 +3953,17 @@
                 });
 
                 document.getElementById('backFromHeroes').addEventListener('click', () => {
+                    this.uiManager.showScreen('mainMenu');
+                    this.uiManager.updateCoinDisplays(this.playerStats);
+                });
+
+                document.getElementById('skinsBtn').addEventListener('click', () => {
+                    this.uiManager.populateSkinsScreen(this.playerStats);
+                    this.uiManager.updateCoinDisplays(this.playerStats);
+                    this.uiManager.showScreen('skins');
+                });
+
+                document.getElementById('backFromSkins').addEventListener('click', () => {
                     this.uiManager.showScreen('mainMenu');
                     this.uiManager.updateCoinDisplays(this.playerStats);
                 });
@@ -3675,6 +4233,18 @@
                     setTimeout(() => {
                         this.uiManager.showNotification(`🏆 Achievement Unlocked! +${coinsFromAchievements} coins`, '#4CAF50');
                     }, 1000);
+                }
+
+                // Check for skin unlocks
+                const newSkins = this.playerStats.checkSkinUnlocks();
+                if (newSkins.length > 0) {
+                    setTimeout(() => {
+                        newSkins.forEach((skinInfo, index) => {
+                            setTimeout(() => {
+                                this.uiManager.showNotification(`🎭 New Skin Unlocked: ${skinInfo.name}!`, '#FFD700');
+                            }, index * 1500);
+                        });
+                    }, 2000);
                 }
 
                 this.uiManager.setClickZonesEnabled(false);
