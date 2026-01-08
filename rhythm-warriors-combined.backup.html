@@ -456,7 +456,6 @@
                 <div id="health">Health: 100</div>
                 <div id="lives">Lives: 3</div>
                 <div id="wave">Wave: 1</div>
-                <div id="coins" style="color: #FFD700;">💰 Coins: 0</div>
             </div>
         </div>
 
@@ -492,23 +491,11 @@
         <div id="mainMenu" class="screen">
             <h1>RHYTHM WARRIORS</h1>
             <p>Slash to the beat and defend the realm!</p>
-            <div style="display: flex; justify-content: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; pointer-events: auto;">
-                <div style="background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 10px; border: 2px solid #FFD700;">
-                    <span style="color: #FFD700; font-family: 'Orbitron', sans-serif; font-size: 18px;">💰 <span id="menuCoins">0</span> Coins</span>
-                </div>
-            </div>
             <div class="menu-buttons">
                 <button class="btn" id="classicBtn">Classic Mode</button>
                 <button class="btn" id="endlessBtn">Endless Mode</button>
                 <button class="btn" id="multiplayerBtn">Multiplayer</button>
                 <button class="btn" id="storyBtn">Story Mode</button>
-                <button class="btn" id="sideQuestsBtn" style="background: linear-gradient(45deg, #9B59B6, #8E44AD);">Side Quests</button>
-                <button class="btn" id="bossRushBtn" style="background: linear-gradient(45deg, #C0392B, #E74C3C);">Boss Rush</button>
-                <button class="btn" id="dailyChallengeBtn" style="background: linear-gradient(45deg, #F39C12, #E67E22);">Daily Challenge</button>
-                <button class="btn btn-secondary" id="shopBtn">🛒 Shop</button>
-                <button class="btn btn-secondary" id="heroesBtn">⚔️ Heroes</button>
-                <button class="btn btn-secondary" id="upgradesBtn">⬆️ Upgrades</button>
-                <button class="btn btn-secondary" id="achievementsBtn">🏆 Achievements</button>
                 <button class="btn btn-secondary" id="statsBtn">Stats</button>
                 <button class="btn btn-secondary" id="howToPlayBtn">How to Play</button>
             </div>
@@ -642,88 +629,6 @@
             ⭐ Score Boost: Double points<br>
             ⚔️ Giant Sword: Bigger slash, deals double damage</p>
             <button class="btn" id="backFromHowTo">Back</button>
-        </div>
-
-        <!-- Shop Screen -->
-        <div id="shop" class="screen hidden">
-            <h2>🛒 Shop</h2>
-            <p>Purchase heroes and powerups with your hard-earned coins!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #FFD700; font-size: 24px; font-weight: bold;">💰 <span id="shopCoins">0</span> Coins</span>
-            </div>
-            <div id="shopContent" style="max-height: 400px; overflow-y: auto; padding: 20px;"></div>
-            <button class="btn" id="backFromShop">Back</button>
-        </div>
-
-        <!-- Heroes Screen -->
-        <div id="heroes" class="screen hidden">
-            <h2>⚔️ Heroes</h2>
-            <p>Select and unlock powerful heroes with unique abilities!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #FFD700; font-size: 24px; font-weight: bold;">💰 <span id="heroesCoins">0</span> Coins</span>
-            </div>
-            <div id="heroesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
-            <button class="btn" id="backFromHeroes">Back</button>
-        </div>
-
-        <!-- Upgrades Screen -->
-        <div id="upgrades" class="screen hidden">
-            <h2>⬆️ Upgrades</h2>
-            <p>Enhance your warrior with permanent upgrades!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #FFD700; font-size: 24px; font-weight: bold;">💰 <span id="upgradesCoins">0</span> Coins</span>
-            </div>
-            <div id="upgradesGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
-            <button class="btn" id="backFromUpgrades">Back</button>
-        </div>
-
-        <!-- Achievements Screen -->
-        <div id="achievementsScreen" class="screen hidden">
-            <h2>🏆 Achievements</h2>
-            <p>Complete challenges to earn coin rewards!</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <span style="color: #4CAF50; font-size: 20px; font-weight: bold;">
-                    <span id="achievementProgress">0</span> / <span id="achievementTotal">0</span> Unlocked
-                </span>
-            </div>
-            <div id="achievementsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; padding: 20px; max-height: 400px; overflow-y: auto;"></div>
-            <button class="btn" id="backFromAchievements">Back</button>
-        </div>
-
-        <!-- Daily Challenge Screen -->
-        <div id="dailyChallenge" class="screen hidden">
-            <h2>📅 Daily Challenge</h2>
-            <p>Complete today's challenge for bonus rewards!</p>
-            <div id="dailyChallengeContent" style="padding: 30px; max-width: 600px; margin: 0 auto;"></div>
-            <button class="btn" id="backFromDaily">Back</button>
-        </div>
-
-        <!-- Side Quests Screen -->
-        <div id="sideQuests" class="screen hidden">
-            <h2>🗺️ Side Quests</h2>
-            <p>Special missions with unique challenges and rewards!</p>
-            <div id="sideQuestsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; max-height: 450px; overflow-y: auto;"></div>
-            <button class="btn" id="backFromSideQuests">Back</button>
-        </div>
-
-        <!-- Boss Rush Screen -->
-        <div id="bossRush" class="screen hidden">
-            <h2>💀 Boss Rush</h2>
-            <p>Face all 5 story bosses back-to-back in the ultimate challenge!</p>
-            <div style="padding: 30px; max-width: 600px; margin: 0 auto;">
-                <div style="background: rgba(192, 57, 43, 0.2); border: 2px solid #C0392B; border-radius: 15px; padding: 25px; margin: 20px 0;">
-                    <h3 style="color: #FF4444; margin-bottom: 15px;">⚠️ EXTREME DIFFICULTY</h3>
-                    <p style="font-size: 16px; line-height: 1.8;">
-                        • Face 5 powerful bosses consecutively<br>
-                        • No breaks between battles<br>
-                        • One life per boss<br>
-                        • Reward: 💰 3000 Coins<br>
-                        • Difficulty: INSANE
-                    </p>
-                </div>
-                <button class="btn" id="startBossRush" style="font-size: 22px; padding: 15px 40px;">Accept Challenge</button>
-            </div>
-            <button class="btn btn-secondary" id="backFromBossRush">Back</button>
         </div>
 
         <!-- Story Cutscene Modal -->
@@ -879,7 +784,6 @@
                 title: "Final Stand",
                 description: "This is it. Defeat the ultimate boss to save the realm!",
                 waves: 10,
-                reward: { coins: 1000, hero: 'shadow' },
                 openingCutscene: {
                     dialogue: [
                         { text: "The final confrontation is here.", duration: 3000 },
@@ -896,282 +800,6 @@
                         { text: "You are the true Rhythm Warrior!", duration: 3000 }
                     ]
                 }
-            },
-            4: {
-                title: "Echoes of Darkness",
-                description: "The Demon Lord's corruption left rifts in reality. Seal them before they spread!",
-                waves: 12,
-                reward: { coins: 1500, powerup: 'timeFreeze' },
-                openingCutscene: {
-                    dialogue: [
-                        { text: "Peace was short-lived...", duration: 3000 },
-                        { text: "Rifts in the fabric of reality tear open.", duration: 3000 },
-                        { text: "Echoes of the Demon Lord's power still linger.", duration: 3000 },
-                        { text: "You must seal these rifts before darkness returns!", duration: 3000 }
-                    ]
-                },
-                endingCutscene: {
-                    dialogue: [
-                        { text: "The rifts are sealed... for now.", duration: 2500 },
-                        { text: "But a greater threat is awakening...", duration: 2500 }
-                    ]
-                }
-            },
-            5: {
-                title: "The Ancient Awakening",
-                description: "An ancient evil, older than the kingdom itself, has awakened. This is the true final battle!",
-                waves: 15,
-                reward: { coins: 2500, hero: 'ancient' },
-                openingCutscene: {
-                    dialogue: [
-                        { text: "From the depths of time, something stirs...", duration: 3000 },
-                        { text: "An entity older than Harmonia itself awakens.", duration: 3000 },
-                        { text: "The Chaos Primordial rises!", duration: 3000 },
-                        { text: "This is the battle that will determine the fate of all existence!", duration: 3500 }
-                    ]
-                },
-                endingCutscene: {
-                    dialogue: [
-                        { text: "VICTORY! The Chaos Primordial is vanquished!", duration: 3000 },
-                        { text: "The timeline stabilizes. Reality is saved.", duration: 3000 },
-                        { text: "You have become a legend that transcends time itself.", duration: 3000 },
-                        { text: "Peace returns... but will it last?", duration: 3000 }
-                    ]
-                }
-            }
-        };
-
-        // ============================================
-        // PROGRESSION SYSTEM CONSTANTS
-        // ============================================
-
-        const HEROES = {
-            default: {
-                name: "Rhythm Knight",
-                description: "The original defender of Harmonia",
-                cost: 0,
-                unlocked: true,
-                color: '#FFD700',
-                bodyColor: '#FFA500',
-                ability: {
-                    name: "Balanced Strike",
-                    description: "Standard attacks with balanced power",
-                    stats: { damageMultiplier: 1.0, healthBonus: 0, cooldownReduction: 0 }
-                }
-            },
-            shadow: {
-                name: "Shadow Dancer",
-                description: "Master of speed and precision",
-                cost: 1000,
-                unlocked: false,
-                color: '#8B00FF',
-                bodyColor: '#4B0082',
-                ability: {
-                    name: "Swift Strike",
-                    description: "30% faster attacks, 20% less health",
-                    stats: { damageMultiplier: 1.2, healthBonus: -20, cooldownReduction: 0.3 }
-                }
-            },
-            tank: {
-                name: "Iron Guardian",
-                description: "Unstoppable defensive powerhouse",
-                cost: 800,
-                unlocked: false,
-                color: '#C0C0C0',
-                bodyColor: '#808080',
-                ability: {
-                    name: "Fortified Defense",
-                    description: "50% more health, 20% slower attacks",
-                    stats: { damageMultiplier: 0.8, healthBonus: 50, cooldownReduction: -0.2 }
-                }
-            },
-            berserker: {
-                name: "Berserker",
-                description: "High risk, high reward warrior",
-                cost: 1200,
-                unlocked: false,
-                color: '#FF0000',
-                bodyColor: '#8B0000',
-                ability: {
-                    name: "Rampage",
-                    description: "50% more damage, 30% less health",
-                    stats: { damageMultiplier: 1.5, healthBonus: -30, cooldownReduction: 0 }
-                }
-            },
-            ancient: {
-                name: "Ancient Sage",
-                description: "Legendary hero from beyond time",
-                cost: 2500,
-                unlocked: false,
-                color: '#00FFFF',
-                bodyColor: '#008B8B',
-                ability: {
-                    name: "Timeless Wisdom",
-                    description: "All stats increased by 25%",
-                    stats: { damageMultiplier: 1.25, healthBonus: 25, cooldownReduction: 0.25 }
-                }
-            }
-        };
-
-        const UPGRADES = {
-            maxHealth: {
-                name: "Max Health",
-                description: "Increase your maximum health",
-                maxLevel: 10,
-                baseCost: 100,
-                costMultiplier: 1.5,
-                effect: (level) => ({ health: 10 * level })
-            },
-            damage: {
-                name: "Attack Power",
-                description: "Increase damage dealt to enemies",
-                maxLevel: 10,
-                baseCost: 150,
-                costMultiplier: 1.6,
-                effect: (level) => ({ damageMultiplier: 1 + (level * 0.1) })
-            },
-            arrowCooldown: {
-                name: "Arrow Mastery",
-                description: "Reduce arrow cooldown time",
-                maxLevel: 5,
-                baseCost: 200,
-                costMultiplier: 2.0,
-                effect: (level) => ({ cooldownReduction: level * 0.15 })
-            },
-            startingLives: {
-                name: "Extra Lives",
-                description: "Start with more lives",
-                maxLevel: 3,
-                baseCost: 500,
-                costMultiplier: 2.5,
-                effect: (level) => ({ lives: level })
-            },
-            coinMultiplier: {
-                name: "Coin Magnet",
-                description: "Earn more coins from enemies",
-                maxLevel: 5,
-                baseCost: 300,
-                costMultiplier: 1.8,
-                effect: (level) => ({ coinMultiplier: 1 + (level * 0.2) })
-            },
-            comboMaster: {
-                name: "Combo Master",
-                description: "Combo multiplier increases faster",
-                maxLevel: 5,
-                baseCost: 250,
-                costMultiplier: 1.7,
-                effect: (level) => ({ comboBonus: level * 0.1 })
-            }
-        };
-
-        const ACHIEVEMENTS = {
-            firstBlood: { name: "First Blood", description: "Defeat your first enemy", reward: 50, condition: (stats) => stats.totalEnemies >= 1 },
-            centurion: { name: "Centurion", description: "Defeat 100 enemies", reward: 200, condition: (stats) => stats.totalEnemies >= 100 },
-            slayer: { name: "Slayer", description: "Defeat 500 enemies", reward: 500, condition: (stats) => stats.totalEnemies >= 500 },
-            legend: { name: "Legend", description: "Defeat 1000 enemies", reward: 1000, condition: (stats) => stats.totalEnemies >= 1000 },
-
-            comboNovice: { name: "Combo Novice", description: "Reach a 10x combo", reward: 100, condition: (stats) => stats.maxCombo >= 10 },
-            comboMaster: { name: "Combo Master", description: "Reach a 50x combo", reward: 300, condition: (stats) => stats.maxCombo >= 50 },
-            comboGod: { name: "Combo God", description: "Reach a 100x combo", reward: 800, condition: (stats) => stats.maxCombo >= 100 },
-
-            scoreApprentice: { name: "Score Apprentice", description: "Score 10,000 points", reward: 100, condition: (stats) => stats.highScore >= 10000 },
-            scoreExpert: { name: "Score Expert", description: "Score 50,000 points", reward: 400, condition: (stats) => stats.highScore >= 50000 },
-            scoreLegend: { name: "Score Legend", description: "Score 100,000 points", reward: 1000, condition: (stats) => stats.highScore >= 100000 },
-
-            perfectionist: { name: "Perfectionist", description: "Land 100 perfect hits", reward: 300, condition: (stats) => stats.perfectHits >= 100 },
-            sharpshooter: { name: "Sharpshooter", description: "Land 500 perfect hits", reward: 700, condition: (stats) => stats.perfectHits >= 500 },
-
-            survivor: { name: "Survivor", description: "Complete 10 waves", reward: 200, condition: (stats) => stats.wavesCompleted >= 10 },
-            veteran: { name: "Veteran", description: "Complete 50 waves", reward: 600, condition: (stats) => stats.wavesCompleted >= 50 },
-
-            storyBegin: { name: "The Journey Begins", description: "Complete Chapter 1", reward: 300, condition: (stats) => stats.chaptersCompleted >= 1 },
-            storyMid: { name: "Demon Slayer", description: "Complete Chapter 3", reward: 800, condition: (stats) => stats.chaptersCompleted >= 3 },
-            storyEnd: { name: "Legend of Harmonia", description: "Complete all 5 chapters", reward: 2000, condition: (stats) => stats.chaptersCompleted >= 5 },
-
-            dedicated: { name: "Dedicated Warrior", description: "Play 10 games", reward: 150, condition: (stats) => stats.gamesPlayed >= 10 },
-            addicted: { name: "Can't Stop Playing", description: "Play 50 games", reward: 500, condition: (stats) => stats.gamesPlayed >= 50 },
-
-            richMan: { name: "Wealthy Warrior", description: "Collect 10,000 coins total", reward: 1000, condition: (stats) => stats.totalCoins >= 10000 }
-        };
-
-        const DAILY_CHALLENGES = [
-            { name: "Speed Demon", description: "Complete 5 waves in under 3 minutes", reward: 500, condition: { type: 'time', waves: 5, time: 180 } },
-            { name: "Combo King", description: "Reach a 30x combo", reward: 300, condition: { type: 'combo', target: 30 } },
-            { name: "Perfect Warrior", description: "Land 50 perfect hits", reward: 400, condition: { type: 'perfectHits', target: 50 } },
-            { name: "Unstoppable", description: "Complete 10 waves without taking damage", reward: 800, condition: { type: 'noDamage', waves: 10 } },
-            { name: "Sharpshooter", description: "Defeat 30 enemies with arrows", reward: 350, condition: { type: 'arrowKills', target: 30 } },
-            { name: "Collector", description: "Collect 1000 coins in one run", reward: 400, condition: { type: 'coins', target: 1000 } },
-            { name: "Boss Slayer", description: "Defeat 3 bosses", reward: 600, condition: { type: 'bosses', target: 3 } }
-        ];
-
-        const SIDE_QUESTS = {
-            training: {
-                name: "Training Grounds",
-                description: "Practice your skills - No lives lost on failure",
-                difficulty: 'easy',
-                waves: 3,
-                reward: { coins: 200 },
-                special: 'practice'
-            },
-            treasure: {
-                name: "Treasure Hunt",
-                description: "Collect bonus coins! Enemies drop 3x coins",
-                difficulty: 'normal',
-                waves: 5,
-                reward: { coins: 800 },
-                special: 'extraCoins'
-            },
-            survival: {
-                name: "Survival Challenge",
-                description: "Survive as long as possible with 1 life",
-                difficulty: 'hard',
-                waves: 999,
-                reward: { coins: 1500 },
-                special: 'oneLife'
-            },
-            perfectRun: {
-                name: "Perfect Run",
-                description: "Complete 5 waves with 95%+ accuracy",
-                difficulty: 'hard',
-                waves: 5,
-                reward: { coins: 1000, powerup: 'perfectStrike' },
-                special: 'accuracy'
-            }
-        };
-
-        const BOSS_RUSH_CONFIG = {
-            name: "Boss Rush",
-            description: "Face all story bosses back-to-back!",
-            waves: 5, // One for each chapter boss
-            reward: { coins: 3000 },
-            difficulty: 'insane',
-            bossOnly: true
-        };
-
-        const EVENT_MODES = {
-            halloween: {
-                name: "Halloween Havoc",
-                description: "Spooky enemies and double rewards!",
-                active: false,
-                startDate: "10-01",
-                endDate: "11-01",
-                theme: { enemyColors: ['#FF6600', '#000000', '#8B00FF'], rewardMultiplier: 2 }
-            },
-            christmas: {
-                name: "Winter Wonderland",
-                description: "Festive enemies and bonus coins!",
-                active: false,
-                startDate: "12-01",
-                endDate: "12-31",
-                theme: { enemyColors: ['#FF0000', '#00FF00', '#FFFFFF'], coinMultiplier: 1.5 }
-            },
-            newYear: {
-                name: "New Year Bash",
-                description: "Celebrate with fireworks and triple XP!",
-                active: false,
-                startDate: "12-31",
-                endDate: "01-07",
-                theme: { particleExplosion: true, rewardMultiplier: 3 }
             }
         };
 
@@ -1229,8 +857,6 @@
                 this.slashEffects = [];
                 this.missEffects = [];
                 this.powerups = [];
-                this.coins = [];
-                this.coinsEarned = 0;
                 this.activePowerups = [];
                 this.bossFight = false;
                 this.gameTime = 0;
@@ -1247,8 +873,6 @@
                 this.arrowCooldown = 0;
                 this.arrowLastShot = 0;
                 this.arrowMode = false;
-                this.selectedHero = 'default';
-                this.sideQuestMode = null;
             }
 
             getDifficultySettings() {
@@ -1372,7 +996,6 @@
                     const saved = localStorage.getItem(GAME_CONFIG.STORAGE_KEY);
                     if (saved) {
                         Object.assign(this, JSON.parse(saved));
-                        this.ensureNewProperties();
                     } else {
                         this.reset();
                     }
@@ -1380,22 +1003,6 @@
                     console.error('Failed to load stats:', error);
                     this.reset();
                 }
-            }
-
-            ensureNewProperties() {
-                // Ensure new properties exist for players with old save data
-                if (this.coins === undefined) this.coins = 0;
-                if (this.totalCoins === undefined) this.totalCoins = 0;
-                if (this.unlockedHeroes === undefined) this.unlockedHeroes = { default: true };
-                if (this.selectedHero === undefined) this.selectedHero = 'default';
-                if (this.upgrades === undefined) this.upgrades = {};
-                if (this.unlockedAchievements === undefined) this.unlockedAchievements = {};
-                if (this.dailyChallengeDate === undefined) this.dailyChallengeDate = null;
-                if (this.dailyChallengeIndex === undefined) this.dailyChallengeIndex = 0;
-                if (this.dailyChallengeProgress === undefined) this.dailyChallengeProgress = {};
-                if (this.chaptersCompleted === undefined) this.chaptersCompleted = 0;
-                if (this.wavesCompleted === undefined) this.wavesCompleted = 0;
-                if (this.completedSideQuests === undefined) this.completedSideQuests = {};
             }
 
             save() {
@@ -1414,18 +1021,6 @@
                 this.totalMisses = 0;
                 this.perfectHits = 0;
                 this.gamesPlayed = 0;
-                this.coins = 0;
-                this.totalCoins = 0;
-                this.unlockedHeroes = { default: true };
-                this.selectedHero = 'default';
-                this.upgrades = {};
-                this.unlockedAchievements = {};
-                this.dailyChallengeDate = null;
-                this.dailyChallengeIndex = 0;
-                this.dailyChallengeProgress = {};
-                this.chaptersCompleted = 0;
-                this.wavesCompleted = 0;
-                this.completedSideQuests = {};
             }
 
             update(gameState) {
@@ -1436,150 +1031,7 @@
                 this.totalMisses += gameState.totalMisses;
                 this.perfectHits += gameState.perfectHits;
                 this.gamesPlayed++;
-                this.wavesCompleted += gameState.wave;
-
-                // Add coins earned during game
-                if (gameState.coinsEarned) {
-                    this.addCoins(gameState.coinsEarned);
-                }
-
-                // Check for achievements
-                this.checkAchievements();
-
                 this.save();
-            }
-
-            addCoins(amount) {
-                this.coins += amount;
-                this.totalCoins += amount;
-                this.save();
-            }
-
-            spendCoins(amount) {
-                if (this.coins >= amount) {
-                    this.coins -= amount;
-                    this.save();
-                    return true;
-                }
-                return false;
-            }
-
-            unlockHero(heroId) {
-                const hero = HEROES[heroId];
-                if (!hero || this.unlockedHeroes[heroId]) return false;
-
-                if (this.spendCoins(hero.cost)) {
-                    this.unlockedHeroes[heroId] = true;
-                    this.save();
-                    return true;
-                }
-                return false;
-            }
-
-            selectHero(heroId) {
-                if (this.unlockedHeroes[heroId]) {
-                    this.selectedHero = heroId;
-                    this.save();
-                    return true;
-                }
-                return false;
-            }
-
-            getUpgradeLevel(upgradeId) {
-                return this.upgrades[upgradeId] || 0;
-            }
-
-            getUpgradeCost(upgradeId) {
-                const upgrade = UPGRADES[upgradeId];
-                const level = this.getUpgradeLevel(upgradeId);
-                return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, level));
-            }
-
-            canUpgrade(upgradeId) {
-                const upgrade = UPGRADES[upgradeId];
-                const level = this.getUpgradeLevel(upgradeId);
-                return level < upgrade.maxLevel && this.coins >= this.getUpgradeCost(upgradeId);
-            }
-
-            purchaseUpgrade(upgradeId) {
-                if (!this.canUpgrade(upgradeId)) return false;
-
-                const cost = this.getUpgradeCost(upgradeId);
-                if (this.spendCoins(cost)) {
-                    this.upgrades[upgradeId] = (this.upgrades[upgradeId] || 0) + 1;
-                    this.save();
-                    return true;
-                }
-                return false;
-            }
-
-            checkAchievements() {
-                let coinsEarned = 0;
-
-                for (const [id, achievement] of Object.entries(ACHIEVEMENTS)) {
-                    if (!this.unlockedAchievements[id] && achievement.condition(this)) {
-                        this.unlockedAchievements[id] = true;
-                        coinsEarned += achievement.reward;
-                    }
-                }
-
-                if (coinsEarned > 0) {
-                    this.addCoins(coinsEarned);
-                    return coinsEarned;
-                }
-                return 0;
-            }
-
-            getDailyChallenge() {
-                const today = new Date().toDateString();
-                if (this.dailyChallengeDate !== today) {
-                    this.dailyChallengeDate = today;
-                    this.dailyChallengeIndex = Math.floor(Math.random() * DAILY_CHALLENGES.length);
-                    this.dailyChallengeProgress = {};
-                    this.save();
-                }
-                return DAILY_CHALLENGES[this.dailyChallengeIndex];
-            }
-
-            completeDailyChallenge() {
-                const challenge = this.getDailyChallenge();
-                this.addCoins(challenge.reward);
-                this.dailyChallengeProgress.completed = true;
-                this.save();
-            }
-
-            completeChapter(chapterNum) {
-                if (chapterNum > this.chaptersCompleted) {
-                    this.chaptersCompleted = chapterNum;
-
-                    // Award chapter rewards
-                    const chapter = STORY_CHAPTERS[chapterNum];
-                    if (chapter && chapter.reward) {
-                        if (chapter.reward.coins) {
-                            this.addCoins(chapter.reward.coins);
-                        }
-                        if (chapter.reward.hero) {
-                            this.unlockedHeroes[chapter.reward.hero] = true;
-                        }
-                    }
-
-                    this.save();
-                }
-            }
-
-            completeSideQuest(questId) {
-                if (!this.completedSideQuests[questId]) {
-                    this.completedSideQuests[questId] = true;
-
-                    const quest = SIDE_QUESTS[questId];
-                    if (quest && quest.reward) {
-                        if (quest.reward.coins) {
-                            this.addCoins(quest.reward.coins);
-                        }
-                    }
-
-                    this.save();
-                }
             }
 
             getAccuracy() {
@@ -2003,65 +1455,6 @@
             }
         }
 
-        class Coin {
-            constructor(x, y, value = 10) {
-                this.x = x;
-                this.y = y;
-                this.value = value;
-                this.size = 20;
-                this.speed = 2;
-                this.rotation = 0;
-                this.collected = false;
-                this.pulsePhase = Math.random() * Math.PI * 2;
-            }
-
-            update() {
-                this.y += this.speed;
-                this.rotation += 0.1;
-                this.pulsePhase += 0.1;
-            }
-
-            draw(ctx) {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.rotation);
-
-                const pulse = 1 + Math.sin(this.pulsePhase) * 0.2;
-                const size = this.size * pulse;
-
-                // Draw coin
-                ctx.fillStyle = '#FFD700';
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#FFD700';
-                ctx.beginPath();
-                ctx.arc(0, 0, size / 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Draw coin inner circle
-                ctx.fillStyle = '#FFA500';
-                ctx.beginPath();
-                ctx.arc(0, 0, size / 3, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Draw coin symbol
-                ctx.fillStyle = 'white';
-                ctx.font = `bold ${size * 0.8}px Arial`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('$', 0, 0);
-
-                ctx.restore();
-            }
-
-            isPastTarget() {
-                return this.y > GAME_CONFIG.TARGET_LINE_Y + 100;
-            }
-
-            isAtTarget() {
-                return Math.abs(this.y - GAME_CONFIG.TARGET_LINE_Y) < GAME_CONFIG.GOOD_HIT_RANGE;
-            }
-        }
-
         class Particle {
             constructor(x, y, color) {
                 this.x = x;
@@ -2389,17 +1782,13 @@
                                 gameState.score += score;
                                 gameState.incrementCombo();
                                 gameState.totalHits++;
-
+                                
                                 if (isPerfect) {
                                     gameState.perfectHits++;
                                 }
-
+                                
                                 gameState.waveEnemiesDefeated++;
                                 this.createParticles(gameState, enemy);
-
-                                // Spawn coins
-                                this.spawnCoins(gameState, enemy);
-
                                 gameState.enemies.splice(i, 1);
                             }
                             
@@ -2493,10 +1882,6 @@
                                 gameState.score += score;
                                 gameState.waveEnemiesDefeated++;
                                 this.createParticles(gameState, enemy);
-
-                                // Spawn coins
-                                this.spawnCoins(gameState, enemy);
-
                                 gameState.enemies.splice(j, 1);
                             }
                             
@@ -2510,39 +1895,6 @@
                     if (hit) {
                         gameState.arrows.splice(i, 1);
                     }
-                }
-            }
-
-            spawnCoins(gameState, enemy) {
-                // Determine coin value based on enemy type
-                const baseCoinValue = enemy.isBoss ? 50 : 10;
-                const coinCount = enemy.isBoss ? 3 : 1;
-
-                for (let i = 0; i < coinCount; i++) {
-                    gameState.coins.push(new Coin(enemy.x, enemy.y, baseCoinValue));
-                }
-            }
-
-            collectCoins(gameState) {
-                // Check for coin collection
-                for (let i = gameState.coins.length - 1; i >= 0; i--) {
-                    const coin = gameState.coins[i];
-
-                    if (coin.isAtTarget()) {
-                        // Auto-collect coins when they reach target line
-                        gameState.coinsEarned += coin.value;
-                        this.createCoinParticles(gameState, coin);
-                        gameState.coins.splice(i, 1);
-                    } else if (coin.isPastTarget()) {
-                        // Remove coins that are missed
-                        gameState.coins.splice(i, 1);
-                    }
-                }
-            }
-
-            createCoinParticles(gameState, coin) {
-                for (let i = 0; i < 10; i++) {
-                    gameState.particles.push(new Particle(coin.x, coin.y, '#FFD700'));
                 }
             }
         }
@@ -2622,7 +1974,6 @@
                 // Draw entities
                 gameState.enemies.forEach(enemy => enemy.draw(this.ctx));
                 gameState.powerups.forEach(powerup => powerup.draw(this.ctx));
-                gameState.coins.forEach(coin => coin.draw(this.ctx));
                 gameState.arrows.forEach(arrow => arrow.draw(this.ctx));
                 gameState.particles.forEach(particle => particle.draw(this.ctx));
                 gameState.slashEffects.forEach(effect => effect.draw(this.ctx));
@@ -3243,8 +2594,7 @@
                 // Update entities
                 this.gameState.enemies.forEach(enemy => enemy.update());
                 this.gameState.powerups.forEach(powerup => powerup.update());
-                this.gameState.coins.forEach(coin => coin.update());
-
+                
                 // Update arrows
                 this.gameState.arrows.forEach(arrow => arrow.update());
                 this.gameState.arrows = this.gameState.arrows.filter(arrow => !arrow.isOffScreen());
@@ -3273,7 +2623,6 @@
                 // Check collisions
                 this.collisionManager.checkArrowCollisions(this.gameState);
                 this.collisionManager.checkMissedEntities(this.gameState);
-                this.collisionManager.collectCoins(this.gameState);
                 
                 // Check wave progression
                 if (this.waveManager.shouldAdvanceWave(this.gameState)) {
