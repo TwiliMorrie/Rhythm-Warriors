@@ -1024,6 +1024,117 @@
         };
 
         // ============================================
+        // DYNAMIC STORY SYSTEM
+        // ============================================
+
+        // Skin-specific story flavor text that adds to dialogue
+        const SKIN_STORY_FLAVOR = {
+            // Rhythm Knight Skins
+            default_neonVanguard: {
+                prefix: "Your armor glows with absorbed rhythm energy from the rifts...",
+                suffix: "The neon light pulses with each heartbeat of battle."
+            },
+            default_goldenMaestro: {
+                prefix: "Your golden armor shines with the light of a thousand victories...",
+                suffix: "You are the embodiment of Harmonia's glory."
+            },
+            default_festivalChampion: {
+                prefix: "Adorned in festival regalia, you bring hope and celebration...",
+                suffix: "Your vibrant presence lifts the spirits of all who fight alongside you."
+            },
+
+            // Shadow Dancer Skins
+            shadow_voidAssassin: {
+                prefix: "Cloaked in void essence, you move between shadows...",
+                suffix: "The darkness itself bends to your will."
+            },
+            shadow_cyberNinja: {
+                prefix: "Your cybernetic enhancements hum with technological precision...",
+                suffix: "You are the perfect fusion of rhythm and technology."
+            },
+            shadow_eclipsePhantom: {
+                prefix: "During the eternal eclipse, your power reaches its zenith...",
+                suffix: "You are the shadow that eclipses all evil."
+            },
+
+            // Iron Guardian Skins
+            tank_runicFortress: {
+                prefix: "Ancient runes cover your armor, pulsing with protective magic...",
+                suffix: "You are an unbreakable bastion against the darkness."
+            },
+            tank_moltenBulwark: {
+                prefix: "Forged in volcanic fury, your armor radiates searing heat...",
+                suffix: "Your burning resolve turns enemies to ash."
+            },
+            tank_crystalSentinel: {
+                prefix: "Crystalline armor reflects and amplifies rhythm energy...",
+                suffix: "You are a living prism of pure harmonic power."
+            },
+
+            // Berserker Skins
+            berserker_bloodDrummer: {
+                prefix: "Battle fury courses through your veins with every beat...",
+                suffix: "Your rage is a symphony of destruction."
+            },
+            berserker_hellfireRavager: {
+                prefix: "Wreathed in infernal flames, you are vengeance incarnate...",
+                suffix: "Your hellfire burns away all corruption."
+            },
+            berserker_frostbiteFury: {
+                prefix: "Ice and fury unite in your frozen wrath...",
+                suffix: "Your cold anger preserves Harmonia eternal."
+            },
+
+            // Ancient Sage Skins
+            ancient_astralArchivist: {
+                prefix: "Knowledge from countless timelines flows through you...",
+                suffix: "You have witnessed the birth and death of universes."
+            },
+            ancient_celestialOracle: {
+                prefix: "The stars themselves guide your path...",
+                suffix: "Destiny bends to your cosmic will."
+            },
+            ancient_temporalScribe: {
+                prefix: "You write and rewrite the threads of time itself...",
+                suffix: "Past, present, and future converge in your rhythm."
+            }
+        };
+
+        // Function to get story dialogue with skin-specific modifications
+        function getStoryDialogue(chapterNum, cutsceneType, playerStats) {
+            const chapter = STORY_CHAPTERS[chapterNum];
+            if (!chapter) return null;
+
+            const cutscene = chapter[cutsceneType];
+            if (!cutscene || !cutscene.dialogue) return null;
+
+            // Clone dialogue array
+            let dialogue = JSON.parse(JSON.stringify(cutscene.dialogue));
+
+            // Get equipped skin
+            const heroId = playerStats.selectedHero || 'default';
+            const skinId = playerStats.selectedSkins?.[heroId] || 'default';
+            const skinKey = `${heroId}_${skinId}`;
+
+            // Add skin-specific flavor text if available
+            const flavor = SKIN_STORY_FLAVOR[skinKey];
+            if (flavor && skinId !== 'default') {
+                // Add prefix to first dialogue
+                if (dialogue.length > 0) {
+                    dialogue[0].text = `${flavor.prefix} ${dialogue[0].text}`;
+                }
+
+                // Add suffix to last dialogue
+                if (dialogue.length > 0) {
+                    const lastIndex = dialogue.length - 1;
+                    dialogue[lastIndex].text = `${dialogue[lastIndex].text} ${flavor.suffix}`;
+                }
+            }
+
+            return dialogue;
+        }
+
+        // ============================================
         // PROGRESSION SYSTEM CONSTANTS
         // ============================================
 
@@ -1622,6 +1733,95 @@
         }
 
         // ============================================
+        // IMAGE LOADER
+        // ============================================
+        class ImageLoader {
+            constructor() {
+                this.images = {};
+                this.loadedCount = 0;
+                this.totalCount = 0;
+                this.loadComplete = false;
+            }
+
+            preloadHeroImages() {
+                return new Promise((resolve) => {
+                    const imagesToLoad = [];
+
+                    // Build list of all hero skin images
+                    for (const [heroId, heroSkins] of Object.entries(HERO_SKINS)) {
+                        for (const [skinId, skin] of Object.entries(heroSkins)) {
+                            const imagePath = `assets/heroes/${heroId}/${skinId === 'default' ? 'default' : 'skins'}/${heroId}_${skinId}.png`;
+                            imagesToLoad.push({ heroId, skinId, path: imagePath });
+                        }
+                    }
+
+                    this.totalCount = imagesToLoad.length;
+
+                    if (this.totalCount === 0) {
+                        this.loadComplete = true;
+                        resolve();
+                        return;
+                    }
+
+                    let loaded = 0;
+                    let failed = 0;
+
+                    imagesToLoad.forEach(({ heroId, skinId, path }) => {
+                        const img = new Image();
+
+                        img.onload = () => {
+                            if (!this.images[heroId]) this.images[heroId] = {};
+                            this.images[heroId][skinId] = img;
+                            loaded++;
+                            this.loadedCount = loaded;
+
+                            if (loaded + failed === this.totalCount) {
+                                this.loadComplete = true;
+                                console.log(`✅ Loaded ${loaded}/${this.totalCount} hero images`);
+                                resolve();
+                            }
+                        };
+
+                        img.onerror = () => {
+                            failed++;
+                            console.log(`⚠️ Failed to load image: ${path} (using fallback)`);
+
+                            if (loaded + failed === this.totalCount) {
+                                this.loadComplete = true;
+                                console.log(`✅ Loaded ${loaded}/${this.totalCount} hero images (${failed} failed, using fallbacks)`);
+                                resolve();
+                            }
+                        };
+
+                        img.src = path;
+                    });
+
+                    // Timeout after 5 seconds to prevent hanging
+                    setTimeout(() => {
+                        if (!this.loadComplete) {
+                            console.log('⚠️ Image loading timeout - proceeding with loaded images');
+                            this.loadComplete = true;
+                            resolve();
+                        }
+                    }, 5000);
+                });
+            }
+
+            getImage(heroId, skinId) {
+                return this.images[heroId]?.[skinId] || null;
+            }
+
+            hasImage(heroId, skinId) {
+                return !!this.images[heroId]?.[skinId];
+            }
+
+            getLoadProgress() {
+                if (this.totalCount === 0) return 100;
+                return Math.floor((this.loadedCount / this.totalCount) * 100);
+            }
+        }
+
+        // ============================================
         // PLAYER STATS
         // ============================================
         class PlayerStats {
@@ -2169,22 +2369,27 @@
         // ENTITY CLASSES
         // ============================================
         class Hero {
-            constructor(canvasRef, lane, isPlayer2 = false, playerStats = null) {
+            constructor(canvasRef, lane, isPlayer2 = false, playerStats = null, imageLoader = null) {
                 this.canvas = canvasRef;
                 this.lane = lane;
                 this.isPlayer2 = isPlayer2;
                 this.size = GAME_CONFIG.HERO_SIZE;
                 this.attackAnimation = 0;
                 this.idleAnimation = 0;
+                this.imageLoader = imageLoader;
+
+                // Store hero and skin IDs for image lookup
+                this.heroId = 'default';
+                this.skinId = 'default';
 
                 // Apply skin colors if available
                 if (!isPlayer2 && playerStats) {
-                    const selectedHero = playerStats.selectedHero || 'default';
-                    const selectedSkin = playerStats.selectedSkins[selectedHero] || 'default';
-                    const heroSkins = HERO_SKINS[selectedHero];
+                    this.heroId = playerStats.selectedHero || 'default';
+                    this.skinId = playerStats.selectedSkins[this.heroId] || 'default';
+                    const heroSkins = HERO_SKINS[this.heroId];
 
-                    if (heroSkins && heroSkins[selectedSkin]) {
-                        const skin = heroSkins[selectedSkin];
+                    if (heroSkins && heroSkins[this.skinId]) {
+                        const skin = heroSkins[this.skinId];
                         this.color = skin.color || COLORS.HERO_P1;
                         this.bodyColor = skin.bodyColor || COLORS.HERO_P1_BODY;
                     } else {
@@ -2211,13 +2416,13 @@
 
             draw(ctx, hasGiantSword = false) {
                 this.idleAnimation += 0.05;
-                
+
                 ctx.save();
                 ctx.translate(this.x, this.y);
-                
+
                 const breathe = Math.sin(this.idleAnimation) * 3;
                 ctx.translate(0, breathe);
-                
+
                 if (this.attackAnimation > 0) {
                     ctx.rotate(Math.sin(this.attackAnimation * 0.5) * 0.4);
                     this.attackAnimation--;
@@ -2225,29 +2430,45 @@
 
                 ctx.shadowBlur = 30;
                 ctx.shadowColor = this.color;
-                
-                // Draw body (triangle)
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.moveTo(0, -this.size * 0.8);
-                ctx.lineTo(this.size * 0.5, this.size * 0.4);
-                ctx.lineTo(-this.size * 0.5, this.size * 0.4);
-                ctx.closePath();
-                ctx.fill();
-                
-                // Draw head
-                ctx.fillStyle = this.bodyColor;
-                ctx.beginPath();
-                ctx.arc(0, -this.size * 0.5, this.size * 0.35, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Draw eyes
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(-this.size * 0.15, -this.size * 0.55, this.size * 0.08, 0, Math.PI * 2);
-                ctx.arc(this.size * 0.15, -this.size * 0.55, this.size * 0.08, 0, Math.PI * 2);
-                ctx.fill();
-                
+
+                // Check if we have an image to render
+                const heroImage = this.imageLoader?.getImage(this.heroId, this.skinId);
+
+                if (heroImage && this.imageLoader?.hasImage(this.heroId, this.skinId)) {
+                    // Render character image
+                    const imgSize = this.size * 2.5; // Make image larger than geometric shape
+                    ctx.drawImage(
+                        heroImage,
+                        -imgSize / 2,
+                        -imgSize * 0.85,
+                        imgSize,
+                        imgSize
+                    );
+                } else {
+                    // Fallback: Draw geometric shape
+                    // Draw body (triangle)
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -this.size * 0.8);
+                    ctx.lineTo(this.size * 0.5, this.size * 0.4);
+                    ctx.lineTo(-this.size * 0.5, this.size * 0.4);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Draw head
+                    ctx.fillStyle = this.bodyColor;
+                    ctx.beginPath();
+                    ctx.arc(0, -this.size * 0.5, this.size * 0.35, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Draw eyes
+                    ctx.fillStyle = '#000';
+                    ctx.beginPath();
+                    ctx.arc(-this.size * 0.15, -this.size * 0.55, this.size * 0.08, 0, Math.PI * 2);
+                    ctx.arc(this.size * 0.15, -this.size * 0.55, this.size * 0.08, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
                 // Draw slash effect during attack
                 if (this.attackAnimation > 10) {
                     ctx.strokeStyle = this.color;
@@ -2255,7 +2476,7 @@
                     ctx.shadowBlur = hasGiantSword ? 60 : 40;
                     ctx.shadowColor = this.color;
                     ctx.beginPath();
-                    
+
                     if (hasGiantSword) {
                         // Giant sword - much bigger and longer
                         ctx.moveTo(-this.size * 1.2, -this.size * 0.5);
@@ -3799,26 +4020,36 @@
                 this.ctx = this.canvas.getContext('2d');
                 this.canvas.width = GAME_CONFIG.CANVAS_WIDTH;
                 this.canvas.height = GAME_CONFIG.CANVAS_HEIGHT;
-                
+
                 this.gameState = new GameState();
                 this.playerStats = new PlayerStats();
                 this.audioSystem = new AudioSystem();
+                this.imageLoader = new ImageLoader();
                 this.renderer = new Renderer(this.canvas, this.ctx);
                 this.uiManager = new UIManager();
                 this.cutsceneManager = new CutsceneManager(this.uiManager);
                 this.spawnManager = new SpawnManager();
                 this.collisionManager = new CollisionManager(this.audioSystem);
                 this.waveManager = new WaveManager();
-                
-                // Create heroes
+
+                // Create heroes with imageLoader
                 this.heroes = [
-                    new Hero(this.canvas, 0, false, this.playerStats),
-                    new Hero(this.canvas, 1, false, this.playerStats),
-                    new Hero(this.canvas, 2, false, this.playerStats)
+                    new Hero(this.canvas, 0, false, this.playerStats, this.imageLoader),
+                    new Hero(this.canvas, 1, false, this.playerStats, this.imageLoader),
+                    new Hero(this.canvas, 2, false, this.playerStats, this.imageLoader)
                 ];
-                
+
                 this.lastTime = 0;
                 this.setupEventListeners();
+
+                // Preload hero images
+                this.preloadAssets();
+            }
+
+            async preloadAssets() {
+                console.log('📦 Preloading hero images...');
+                await this.imageLoader.preloadHeroImages();
+                console.log('✅ Hero images ready!');
             }
 
             setupEventListeners() {
@@ -4069,8 +4300,12 @@
                 // Show opening cutscene for story mode
                 if (mode === 'story') {
                     const chapter = STORY_CHAPTERS[this.gameState.storyChapter];
+                    // Get skin-modified dialogue
+                    const dialogue = getStoryDialogue(this.gameState.storyChapter, 'openingCutscene', this.playerStats);
+                    const cutsceneData = dialogue ? { dialogue } : chapter.openingCutscene;
+
                     this.cutsceneManager.playCutscene(
-                        chapter.openingCutscene,
+                        cutsceneData,
                         `Chapter ${this.gameState.storyChapter}: ${chapter.title}`,
                         () => this.showCountdownAndStart(),
                         'opening'
@@ -4253,8 +4488,12 @@
                 // Show ending cutscene for story mode
                 if (this.gameState.gameMode === 'story') {
                     const chapter = STORY_CHAPTERS[this.gameState.storyChapter];
+                    // Get skin-modified dialogue
+                    const dialogue = getStoryDialogue(this.gameState.storyChapter, 'endingCutscene', this.playerStats);
+                    const cutsceneData = dialogue ? { dialogue } : chapter.endingCutscene;
+
                     this.cutsceneManager.playCutscene(
-                        chapter.endingCutscene,
+                        cutsceneData,
                         `Chapter ${this.gameState.storyChapter} Complete!`,
                         () => {
                             this.uiManager.updateGameOverScreen(this.gameState);
