@@ -5,7 +5,9 @@ Since I cannot directly manipulate images, here's how to add your character artw
 ## Option 1: Automated Python Script (Recommended)
 
 ### Step 1: Install Requirements
-```bash
+
+**Windows PowerShell:**
+```powershell
 # Install Python PIL/Pillow
 pip install Pillow
 
@@ -13,13 +15,27 @@ pip install Pillow
 pip install rembg
 ```
 
+**Mac/Linux:**
+```bash
+pip install Pillow
+pip install rembg
+```
+
 ### Step 2: Prepare Your Images
 1. Save the character image grid you shared
 2. Split it into individual character images (use any image editor)
-3. Create a folder called `hero_images/` in the Rhythm-Warriors directory
+3. Create a folder called `hero_images` in the Rhythm-Warriors directory
 4. Place all individual character images there
 
 ### Step 3: Run the Script
+
+**Windows PowerShell:**
+```powershell
+cd Rhythm-Warriors
+python process_hero_images.py
+```
+
+**Mac/Linux:**
 ```bash
 cd Rhythm-Warriors
 python3 process_hero_images.py
@@ -32,7 +48,13 @@ The script will:
 - Name correctly
 
 ### Interactive Mode
-If you want to manually assign each image:
+
+**Windows PowerShell:**
+```powershell
+python process_hero_images.py --interactive
+```
+
+**Mac/Linux:**
 ```bash
 python3 process_hero_images.py --interactive
 ```
@@ -165,9 +187,11 @@ To quickly test if the system works:
 
 1. Save just ONE character image
 2. Rename it to `default_neonVanguard.png`
-3. Place in `assets/heroes/default/skins/`
-4. Refresh game
-5. Equip Neon Vanguard skin
+3. Place in folder:
+   - **Windows:** `assets\heroes\default\skins\`
+   - **Mac/Linux:** `assets/heroes/default/skins/`
+4. Refresh game in browser
+5. Go to Skins menu → Equip Neon Vanguard skin
 6. Start a game
 
 You should see your image (even with background)!
@@ -197,15 +221,37 @@ You should see your image (even with background)!
 
 ## Quick Commands
 
+**Windows PowerShell:**
+```powershell
+# Check if files are in right place
+cd Rhythm-Warriors
+Get-ChildItem -Recurse assets\heroes
+
+# Make all directories at once (run the setup script)
+.\setup_asset_folders.ps1
+
+# Or create folders manually
+New-Item -ItemType Directory -Force assets\heroes\default\default
+New-Item -ItemType Directory -Force assets\heroes\default\skins
+# ... repeat for other heroes
+
+# Run Python script
+python process_hero_images.py
+```
+
+**Mac/Linux:**
 ```bash
 # Check if files are in right place
 cd Rhythm-Warriors
 ls -R assets/heroes/
 
-# Make all directories at once
+# Make all directories at once (run the setup script)
+./setup_asset_folders.sh
+
+# Or create folders manually
 mkdir -p assets/heroes/{default,shadow,tank,berserker,ancient}/{default,skins}
 
-# Run Python script (if you have Python)
+# Run Python script
 python3 process_hero_images.py
 ```
 

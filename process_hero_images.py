@@ -2,11 +2,14 @@
 """
 Hero Image Processor for Rhythm Warriors
 Automatically processes character images: removes backgrounds, resizes, and places in correct folders
+
+Works on Windows, Mac, and Linux!
 """
 
 import os
 from PIL import Image
 import sys
+import platform
 
 # Define the skin mappings (which image goes to which skin)
 SKIN_MAPPINGS = {
@@ -85,12 +88,12 @@ def remove_background(image_path, output_path, target_size=(256, 256)):
 
 def setup_directories():
     """Create all necessary asset directories"""
-    base = "assets/heroes"
+    base = os.path.join("assets", "heroes")
     heroes = ["default", "shadow", "tank", "berserker", "ancient"]
 
     for hero in heroes:
-        os.makedirs(f"{base}/{hero}/default", exist_ok=True)
-        os.makedirs(f"{base}/{hero}/skins", exist_ok=True)
+        os.makedirs(os.path.join(base, hero, "default"), exist_ok=True)
+        os.makedirs(os.path.join(base, hero, "skins"), exist_ok=True)
 
     print("✓ Directory structure created")
 
@@ -130,7 +133,7 @@ def process_images(source_dir="hero_images"):
             # Determine output folder
             folder = "default" if skin_id == "default" else "skins"
             output_filename = f"{hero_id}_{skin_id}.png"
-            output_path = f"assets/heroes/{hero_id}/{folder}/{output_filename}"
+            output_path = os.path.join("assets", "heroes", hero_id, folder, output_filename)
 
             print(f"Processing: {img_file}")
             print(f"  → {description}")
@@ -218,7 +221,7 @@ def interactive_mode():
         source_path = os.path.join(source_dir, img_file)
         folder = "default" if skin_id == "default" else "skins"
         output_filename = f"{hero_id}_{skin_id}.png"
-        output_path = f"assets/heroes/{hero_id}/{folder}/{output_filename}"
+        output_path = os.path.join("assets", "heroes", hero_id, folder, output_filename)
 
         print(f"\nProcessing: {img_file} → {output_path}")
         remove_background(source_path, output_path)
